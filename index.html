@@ -5,253 +5,715 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Crawl-O-Ween 2026</title>
-<meta name="description" content="Our route, every bar sorted by popularity, and the likely trolley stops for Boston's Crawl-O-Ween, Sat Oct 31 2026.">
+<meta name="description" content="Interactive map of our Boston Crawl-O-Ween route, Sat Oct 31 2026: every bar, the party trolleys, and the decision points.">
+<meta name="theme-color" content="#121015">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Crawl-O-Ween">
+<meta property="og:title" content="Crawl-O-Ween 2026">
+<meta property="og:description" content="Our route, every bar, the trolleys, and what's free near you. Sat Oct 31.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎃%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
 :root {
-  --bg: #faf6f1; --surface: #ffffff; --surface-2: #f3ece4; --text: #1d1a17; --muted: #6b625a;
-  --line: #e6dcd1; --accent: #d9560b; --accent-ink: #ffffff; --warn-bg: #fff1e3; --warn-line: #f1b47c;
-  --c6: #c62828; --c8: #b26a00; --c9: #2e7d32;
+  --bg: #faf6f1; --surface: #ffffff; --surface-2: #f3ece4; --text: #1d1a17; --muted: #6b625a; --line: #e6dcd1;
+  --accent: #d9560b; --accent-ink: #ffffff; --warn-bg: #fff1e3; --warn-line: #f1b47c; --ok: #2e7d32; --bad: #c62828;
+  --shadow: 0 6px 24px rgba(30, 20, 10, .18); --map-bg: #e8e4dc;
   --fenway: #e65100; --backbay: #1565c0; --westend: #2e7d32; --faneuil: #6a1b9a; --theater: #c62828; --seaport: #00838f;
+  --walk: #ff6d00; --trolley1: #d81b60; --trolley2: #7c3aed; --green: #00843d; --red: #da291c; --casing: #ffffff;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121015; --surface: #1c1920; --surface-2: #26222b; --text: #f3ede6; --muted: #a59d95;
-    --line: #322d38; --accent: #ff8a3d; --accent-ink: #1a0f06; --warn-bg: #2a1d12; --warn-line: #7a4a22;
-    --c6: #ff6b6b; --c8: #ffb74d; --c9: #81c784;
+    --bg: #121015; --surface: #1c1920; --surface-2: #26222b; --text: #f3ede6; --muted: #a59d95; --line: #35303b;
+    --accent: #ff8a3d; --accent-ink: #1a0f06; --warn-bg: #2a1d12; --warn-line: #7a4a22; --ok: #81c784; --bad: #ff6b6b;
+    --shadow: 0 6px 24px rgba(0, 0, 0, .5); --map-bg: #1b1b1f;
     --fenway: #ff8f3a; --backbay: #64a8ff; --westend: #6fcf75; --faneuil: #c58af0; --theater: #ff6b6b; --seaport: #4fd1db;
+    --walk: #ff9a3d; --trolley1: #ff5c9a; --trolley2: #a78bfa; --green: #2fb36b; --red: #ff5a4e; --casing: #121015;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121015; --surface: #1c1920; --surface-2: #26222b; --text: #f3ede6; --muted: #a59d95;
-  --line: #322d38; --accent: #ff8a3d; --accent-ink: #1a0f06; --warn-bg: #2a1d12; --warn-line: #7a4a22;
-  --c6: #ff6b6b; --c8: #ffb74d; --c9: #81c784;
+  --bg: #121015; --surface: #1c1920; --surface-2: #26222b; --text: #f3ede6; --muted: #a59d95; --line: #35303b;
+  --accent: #ff8a3d; --accent-ink: #1a0f06; --warn-bg: #2a1d12; --warn-line: #7a4a22; --ok: #81c784; --bad: #ff6b6b;
+  --shadow: 0 6px 24px rgba(0, 0, 0, .5); --map-bg: #1b1b1f;
   --fenway: #ff8f3a; --backbay: #64a8ff; --westend: #6fcf75; --faneuil: #c58af0; --theater: #ff6b6b; --seaport: #4fd1db;
+  --walk: #ff9a3d; --trolley1: #ff5c9a; --trolley2: #a78bfa; --green: #2fb36b; --red: #ff5a4e; --casing: #121015;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: 64px; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; -webkit-text-size-adjust: 100%; }
 a { color: inherit; }
-.wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+button { font: inherit; color: inherit; }
 .d-fenway { --d: var(--fenway); } .d-backbay { --d: var(--backbay); } .d-westend { --d: var(--westend); }
 .d-faneuil { --d: var(--faneuil); } .d-theater { --d: var(--theater); } .d-seaport { --d: var(--seaport); }
 
-.hero { padding: 28px 0 18px; }
-.eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: 34px; line-height: 1.05; letter-spacing: -.02em; }
-.sub { margin: 8px 0 0; color: var(--muted); }
-.headline { margin-top: 14px; display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
-.headline b { color: var(--accent); }
+#map { position: fixed; inset: 0; background: var(--map-bg); }
+.leaflet-container { font: inherit; background: var(--map-bg); }
+.style-night .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(.25) brightness(.9) contrast(1.1); }
+.style-day .leaflet-tile-pane { filter: saturate(.7) contrast(.97); }
+.leaflet-top { top: calc(env(safe-area-inset-top) + 60px); }
+.leaflet-control-attribution { font-size: 10px; background: color-mix(in srgb, var(--surface) 80%, transparent) !important; color: var(--muted); }
+.leaflet-control-attribution a { color: var(--muted); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.leaflet-popup-content { margin: 12px 14px; width: min(260px, 70vw) !important; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--muted); }
 
-.tabs { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-.tabs .wrap { display: flex; gap: 6px; padding-top: 8px; padding-bottom: 8px; }
-.tabs a { flex: 1; text-align: center; text-decoration: none; font-weight: 600; font-size: 15px; padding: 10px 6px; border-radius: 10px; color: var(--muted); }
-.tabs a[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+/* top bar */
+.topbar { position: fixed; z-index: 1001; top: calc(env(safe-area-inset-top) + 8px); left: 8px; right: 8px; display: flex; gap: 8px; pointer-events: none; }
+.topbar > * { pointer-events: auto; }
+.brand { flex: 1; min-width: 0; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 7px 12px; display: flex; flex-direction: column; justify-content: center; }
+.brand b { font-size: 16px; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand span { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iconbtn { width: 46px; height: 46px; flex: 0 0 46px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); font-size: 20px; cursor: pointer; display: grid; place-items: center; }
+.iconbtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.layers { position: fixed; z-index: 1002; top: calc(env(safe-area-inset-top) + 62px); right: 8px; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 8px 12px; display: none; }
+.layers.open { display: block; }
+.layers label { display: flex; gap: 10px; align-items: center; padding: 8px 0; font-weight: 600; cursor: pointer; }
+.layers input { width: 18px; height: 18px; accent-color: var(--accent); }
+.lyr-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 6px 0 6px; }
+.layers .seg { margin-bottom: 6px; }
+.layers .seg button { min-height: 36px; font-size: 13px; padding: 6px 10px; }
+.toast { position: fixed; z-index: 1003; left: 50%; top: calc(env(safe-area-inset-top) + 64px); transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; }
 
-section { padding: 18px 0 8px; }
-.js section[hidden] { display: none; }
-h2 { font-size: 22px; margin: 4px 0 12px; letter-spacing: -.01em; }
+/* sheet */
+.sheet { position: fixed; z-index: 1000; left: 0; right: 0; bottom: 0; height: var(--h, 46dvh); background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,.22); display: flex; flex-direction: column; transition: height .22s ease; padding-bottom: env(safe-area-inset-bottom); }
+.sheet[data-state="min"] { --h: 112px; } .sheet[data-state="peek"] { --h: 46dvh; } .sheet[data-state="full"] { --h: 88dvh; }
+.grab { border: 0; background: none; width: 100%; padding: 8px 0 2px; cursor: grab; touch-action: none; }
+.grab::before { content: ""; display: block; width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto; }
+.tabs { display: flex; gap: 6px; padding: 6px 12px 8px; border-bottom: 1px solid var(--line); }
+.tabs button { flex: 1; border: 0; border-radius: 10px; padding: 9px 4px; font-weight: 700; font-size: 14px; background: transparent; color: var(--muted); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.panel { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 14px 24px; overscroll-behavior: contain; }
+.panel[hidden] { display: none; }
+@media (min-width: 900px) {
+  .sheet { left: 12px; right: auto; top: calc(70px + env(safe-area-inset-top)); bottom: 12px; width: 410px; height: auto !important; border-radius: 16px; box-shadow: var(--shadow); }
+  .grab { display: none; }
+  .topbar { right: auto; width: 410px; }
+  .layers { left: 330px; right: auto; }
+  .leaflet-top { top: 12px; }
+}
 
-.alerts { display: grid; gap: 10px; margin-bottom: 18px; }
-.alert { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
-.alert b { display: block; margin-bottom: 2px; }
+/* itinerary */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+.decide { margin: 12px 0; padding: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
+.decide-label { font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); margin-bottom: 8px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { flex: 1 1 auto; min-height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-weight: 650; font-size: 14px; padding: 8px 10px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.it-stop { display: flex; gap: 10px; padding: 8px 0; }
+.num { flex: 0 0 30px; height: 30px; border-radius: 50%; background: var(--d); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); font-weight: 800; display: grid; place-items: center; box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent); margin-top: 2px; }
+.it-body { flex: 1; min-width: 0; }
+.it-time { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--d); font-size: 13px; }
+.it-name { border: 0; background: none; padding: 0; font-size: 17px; font-weight: 750; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.free { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 2px; }
+.it-body p { margin: 4px 0 0; }
+.mini { display: inline-flex; align-items: center; min-height: 34px; margin-top: 6px; padding: 5px 11px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; font-weight: 700; text-decoration: none; }
+.it-leg { display: flex; gap: 10px; align-items: flex-start; margin-left: 14px; padding: 6px 0 6px 18px; border-left: 3px dotted var(--line); font-size: 14px; color: var(--muted); }
+.it-leg .ico { font-size: 16px; line-height: 1.2; }
+.it-leg .mini { margin-top: 4px; }
+.it-note { margin: 2px 0 6px 44px; font-size: 14px; font-style: italic; color: var(--muted); }
+.it-end { margin: 8px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); font-weight: 700; }
 
-.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
-.timeline::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 2px; background: var(--line); }
-.stop { display: flex; gap: 12px; position: relative; padding-bottom: 14px; }
-.dot { flex: 0 0 36px; height: 36px; border-radius: 50%; background: var(--d); color: #fff; font-weight: 700; display: grid; place-items: center; position: relative; z-index: 1; box-shadow: 0 0 0 4px var(--bg); }
-.stop-body { flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
-.stop-body h3 { margin: 0 0 4px; font-size: 19px; }
-.stop-body p { margin: 6px 0; }
-.when { margin: 0 !important; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--d); }
-.meta { font-size: 13px; color: var(--muted); }
-.leg { font-size: 14px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 10px !important; }
-.pill { display: inline-block; font-size: 12px; font-weight: 600; color: var(--d); border: 1px solid var(--d); border-radius: 999px; padding: 1px 8px; margin-right: 4px; }
-
-.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 14px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px; text-decoration: none; }
-.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-
-.chips { display: none; }
-.js .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 14px; scrollbar-width: none; }
+/* bars list */
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
-.chip { flex: 0 0 auto; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; }
+.chip { flex: 0 0 auto; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 12px; font-weight: 650; font-size: 13px; cursor: pointer; }
 .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
-.filter-note { font-size: 13px; color: var(--muted); margin: -6px 0 12px; min-height: 1em; }
+.filter-note { font-size: 13px; color: var(--muted); margin: -2px 0 10px; min-height: 1em; }
+.dhead { display: flex; align-items: center; gap: 8px; margin: 14px 0 6px; font-weight: 800; }
+.dhead .sw { width: 12px; height: 12px; border-radius: 3px; background: var(--d); }
+.row { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: none; padding: 9px 2px; cursor: pointer; }
+.row .rk { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--d); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); font-weight: 800; font-size: 12px; display: grid; place-items: center; }
+.row .nm { flex: 1; min-width: 0; font-weight: 650; }
+.row .nm small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+.row.ended { opacity: .45; }
+.badge { flex: 0 0 auto; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; border: 1px solid currentColor; }
+.badge.ok { color: var(--ok); } .badge.bad { color: var(--bad); }
 
-.district { margin-bottom: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
-.district summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 14px; font-weight: 700; font-size: 18px; }
-.district summary::-webkit-details-marker { display: none; }
-.district summary::after { content: "▾"; margin-left: 6px; color: var(--muted); transition: transform .15s; }
-.district:not([open]) summary::after { transform: rotate(-90deg); }
-.swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--d); flex: 0 0 auto; }
-.dname { flex: 1; min-width: 0; }
-.dcount { font-size: 13px; font-weight: 600; color: var(--muted); }
-.dnote { margin: -6px 14px 10px; font-size: 14px; color: var(--muted); }
-.cards { display: grid; gap: 10px; padding: 0 10px 10px; }
-.empty { display: none; margin: 0 14px 14px; font-size: 14px; color: var(--muted); }
-.district.all-hidden .empty { display: block; }
+/* near me */
+.btnwide { width: 100%; min-height: 46px; border: 0; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 15px; cursor: pointer; }
+.near-sec { margin: 14px 0 2px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.near { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.near .rk { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--d); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); font-weight: 800; font-size: 12px; display: grid; place-items: center; margin-top: 1px; }
+.near-body { flex: 1; min-width: 0; }
+.near-name { border: 0; background: none; padding: 0; font-weight: 750; font-size: 16px; text-align: left; cursor: pointer; }
+.near-meta { font-size: 13px; color: var(--muted); }
+.near-free { display: block; font-size: 12px; font-weight: 800; margin-top: 2px; }
+.near-free.okc { color: var(--ok); } .near-free.soon { color: var(--bad); }
+.near-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
-.bar { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--d); border-radius: 12px; padding: 12px 14px; }
-.bar.hidden { display: none; }
-.bar-head { display: flex; align-items: baseline; gap: 8px; }
-.bar-head h3 { margin: 0; font-size: 17px; flex: 1; min-width: 0; }
-.rank { font-weight: 800; color: var(--d); font-variant-numeric: tabular-nums; }
-.close { flex: 0 0 auto; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
-.close.c6 { color: var(--c6); } .close.c8 { color: var(--c8); } .close.c9 { color: var(--c9); } .close.cx { color: var(--muted); }
-.window { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
-.vibe { margin: 8px 0 0; }
-.perk, .note, .addr { margin: 6px 0 0; font-size: 14px; }
-.note { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 8px; padding: 6px 8px; }
-.addr { color: var(--muted); }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.tag { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 2px 7px; background: var(--surface-2); border: 1px solid var(--line); }
-.tag-route { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+/* info */
+.card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+.card h3 { margin: 0 0 6px; font-size: 16px; }
+.card p, .card li { margin: 4px 0; }
+.card ul { margin: 4px 0; padding-left: 18px; }
+.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.small { font-size: 12px; color: var(--muted); }
 
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-.card h3 { margin: 0 0 4px; font-size: 18px; }
-.conf { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 8px; margin-bottom: 8px; }
-.conf.high { color: var(--c9); border: 1px solid var(--c9); } .conf.med { color: var(--c8); border: 1px solid var(--c8); }
-.route-stops { list-style: none; padding: 0; margin: 8px 0 0; counter-reset: s; }
-.route-stops li { counter-increment: s; display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
-.route-stops li::before { content: counter(s); flex: 0 0 24px; height: 24px; border-radius: 50%; background: var(--surface-2); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
-.route-stops small { display: block; color: var(--muted); }
-.card p { margin: 8px 0 0; }
+/* map pins */
+.pin-wrap { background: none; border: 0; }
+.pin { width: 26px; height: 26px; border-radius: 50%; background: var(--d); color: #fff; font: 800 12px/22px -apple-system, system-ui, sans-serif; text-align: center; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.45); text-shadow: 0 1px 2px rgba(0,0,0,.55); transition: opacity .15s; }
+.pin.dim { opacity: .28; filter: grayscale(.7); }
+.bus { width: 26px; height: 26px; border-radius: 8px; background: #fff; border: 2px solid var(--b); display: grid; place-items: center; font-size: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+.stn { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid #222; color: #222; font: 900 10px/14px Arial, sans-serif; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+.me { width: 18px; height: 18px; border-radius: 50%; background: #1a73e8; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(26,115,232,.25); }
 
-footer { padding: 20px 0 40px; font-size: 13px; color: var(--muted); }
-footer p { margin: 6px 0; }
+/* popup */
+.pop-head { display: flex; gap: 8px; align-items: center; }
+.pop-head .rk { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--d); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); font-weight: 800; font-size: 12px; display: grid; place-items: center; }
+.pop-head b { font-size: 16px; line-height: 1.2; }
+.pop-dist { font-size: 12px; color: var(--muted); margin: 2px 0 6px 34px; }
+.pop p { margin: 6px 0 0; }
+.pop .free { font-size: 13px; }
+.pop .flag { font-size: 13px; padding: 6px 8px; border-radius: 8px; background: var(--warn-bg); border: 1px solid var(--warn-line); }
+.pop-actions { display: flex; gap: 6px; margin-top: 10px; }
+.btn { flex: 1; display: inline-flex; justify-content: center; align-items: center; min-height: 38px; border-radius: 10px; background: var(--accent); color: var(--accent-ink) !important; font-weight: 700; font-size: 13px; text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--text) !important; border: 1px solid var(--line); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<header class="wrap hero">
-  <p class="eyebrow">Sat Oct 31 · 12–9pm · Boston</p>
-  <h1>Crawl-O-Ween 2026</h1>
-  <p class="sub">Our route, every bar sorted by popularity, and the free trolleys.</p>
-  <div class="headline"><span>DJ Pauly D at <b>The Grand</b>, 5:30pm. Every wristband gets in, but it will hit capacity.</span></div>
-</header>
+<div id="map" role="application" aria-label="Map of crawl bars and routes"></div>
 
-<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist">
-  <a href="#route" role="tab" aria-selected="true" data-tab="route">Route</a>
-  <a href="#bars" role="tab" aria-selected="false" data-tab="bars">All bars</a>
-  <a href="#trolleys" role="tab" aria-selected="false" data-tab="trolleys">Trolleys</a>
-</div></nav>
+<div class="topbar">
+  <div class="brand"><b>Crawl-O-Ween 2026</b><span>Sat Oct 31 · Pauly D at The Grand 5:30</span></div>
+  <button class="iconbtn" id="btn-layers" aria-label="Map layers" aria-pressed="false">◫</button>
+  <button class="iconbtn" id="btn-locate" aria-label="Show my location" aria-pressed="false">◎</button>
+</div>
+<div class="layers" id="layers">
+  <div class="lyr-title">Map style</div>
+  <div class="seg" id="style-seg"><button data-style="night" aria-pressed="false">Night</button><button data-style="day" aria-pressed="false">Day</button><button data-style="sat" aria-pressed="false">Satellite</button></div>
+  <div class="lyr-title">Show on map</div>
+  <label><input type="checkbox" id="lyr-walk" checked> Walking paths</label>
+  <label><input type="checkbox" id="lyr-trolley" checked> Trolleys</label>
+  <label><input type="checkbox" id="lyr-train" checked> Train lines</label>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<main class="wrap">
-<section id="route" data-panel="route">
-  <h2>Our route</h2>
-  <div class="alerts">
-    <div class="alert"><b>Check the ticket's check-in spot.</b>This year's list shows Mighty Squirrel as crawl-only from 2pm, with no check-in. Late check-in (until 4pm) is at Game On, Big Night Live, Ned Devine's, Ghost Light and The Grand.</div>
-    <div class="alert"><b>Trolleys probably stop at 6.</b>At past crawls they only ran 2–6pm, so plan on the T or an Uber after Pauly D. The organizer emails the official route the night before.</div>
+<section class="sheet" id="sheet" data-state="peek" aria-label="Crawl guide">
+  <button class="grab" id="grab" aria-label="Resize panel"></button>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="plan" aria-selected="true">Route</button>
+    <button role="tab" data-tab="near" aria-selected="false">Near me</button>
+    <button role="tab" data-tab="bars" aria-selected="false">All bars</button>
+    <button role="tab" data-tab="info" aria-selected="false">Info</button>
   </div>
-  <ol class="timeline"><li class="stop d-fenway"><div class="dot">1</div><div class="stop-body"><p class="when">12:00–12:30</p><h3>Mighty Squirrel</h3><p class="meta"><span class="pill d-fenway">Fenway</span> Crawl 2-9pm (listed as crawl-only, no check-in)</p><p>Check in, get wristbands, have one drink and go. Confirm the check-in spot on your ticket first (see the heads-up above).</p><p class="leg">Walk about 8 min to Loretta&#x27;s on Lansdowne St.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Loretta%27s+Last+Call%2C+1+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking&amp;origin=Mighty+Squirrel%2C+1+David+Ortiz+Dr%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Directions to stop 2</a></div></li><li class="stop d-fenway"><div class="dot">2</div><div class="stop-body"><p class="when">12:40–1:20</p><h3>Loretta&#x27;s Last Call</h3><p class="meta"><span class="pill d-fenway">Fenway</span> Check-in until 3pm, crawl until 9pm</p><p>Line dancing and live country. Go early; the line grows all afternoon.</p><p class="leg">Walk about 5 min down Lansdowne to Game On.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Game+On%21%2C+82+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking&amp;origin=Loretta%27s+Last+Call%2C+1+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Directions to stop 3</a></div></li><li class="stop d-fenway"><div class="dot">3</div><div class="stop-body"><p class="when">1:25–2:00</p><h3>Game On!</h3><p class="meta"><span class="pill d-fenway">Fenway</span> Check-in until 3pm, crawl until 9pm (late check-in until 4pm)</p><p>Huge sports bar under the bleachers, easy to get into for one more. If it&#x27;s nice out, Cisco Fenway&#x27;s beer garden is the alternative.</p><p class="leg">Walk 5 min to Kenmore, then take the Green Line D (Union Square-bound) to North Station, ~20 min. Uber is ~15 min.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Greatest+Bar%2C+262+Friend+St%2C+Boston%2C+MA+02114&amp;travelmode=transit&amp;origin=Game+On%21%2C+82+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Directions to stop 4</a></div></li><li class="stop d-westend"><div class="dot">4</div><div class="stop-body"><p class="when">2:30–3:30</p><h3>The Greatest Bar</h3><p class="meta"><span class="pill d-westend">West End</span> Check-in until 3pm, crawl until 6pm</p><p>The West End&#x27;s top party bar. It closes to the crawl at 6.</p><p class="leg">Walk 2 min to The Harp.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Harp%2C+85+Causeway+St%2C+Boston%2C+MA+02114&amp;travelmode=walking&amp;origin=The+Greatest+Bar%2C+262+Friend+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Directions to stop 5</a></div></li><li class="stop d-westend"><div class="dot">5</div><div class="stop-body"><p class="when">3:30–4:15</p><h3>The Harp</h3><p class="meta"><span class="pill d-westend">West End</span> Check-in until 3pm, crawl until 8pm</p><p>Irish pub with a dance floor. Trolley Route 1 stops here.</p><p class="leg">Walk ~12 min to Quincy Market, or take Trolley Route 1 to Howl at the Moon.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Ned+Devine%27s%2C+1+Faneuil+Hall+Market+St%2C+Boston%2C+MA+02109&amp;travelmode=walking&amp;origin=The+Harp%2C+85+Causeway+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Directions to stop 6</a></div></li><li class="stop d-faneuil"><div class="dot">6</div><div class="stop-body"><p class="when">4:15–5:00</p><h3>Ned Devine&#x27;s</h3><p class="meta"><span class="pill d-faneuil">Faneuil Hall / Financial District</span> Check-in until 3pm, crawl until 6pm (late check-in until 4pm)</p><p>Giant Irish pub inside Quincy Market. It closes to the crawl at 6.</p><p class="leg">Walk ~18 min to The Grand, or walk 8 min to Howl at the Moon and take Trolley Route 1 to Scorpion Bar (same building).</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Grand%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210&amp;travelmode=walking&amp;origin=Ned+Devine%27s%2C+1+Faneuil+Hall+Market+St%2C+Boston%2C+MA+02109" target="_blank" rel="noopener">Directions to stop 7</a></div></li><li class="stop d-seaport"><div class="dot">7</div><div class="stop-body"><p class="when">5:10–6:45</p><h3>The Grand</h3><p class="meta"><span class="pill d-seaport">Seaport</span> Check-in until 2pm, crawl until 8pm (late check-in until 4pm)</p><p>DJ Pauly D at 5:30. Get there by about 5:10, because it will hit capacity.</p><p class="leg">Trolleys likely stop around 6. Walk 10 min to South Station, take the Red Line to Park St, then the Green Line west to Copley, ~30–35 min. Uber is 15–20 min with surge pricing.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dillon%27s%2C+955+Boylston+St%2C+Boston%2C+MA+02115&amp;travelmode=transit&amp;origin=The+Grand%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">Directions to stop 8</a></div></li><li class="stop d-backbay"><div class="dot">8</div><div class="stop-body"><p class="when">7:15–8:00</p><h3>Dillon&#x27;s</h3><p class="meta"><span class="pill d-backbay">Back Bay</span> Check-in until 2pm, crawl until 9pm</p><p>Big patio, open till 9. Back Bay is on the way home, so it goes here.</p><p class="leg">Walk ~15 min down Boylston to Lansdowne, or take the Green Line one stop from Hynes to Kenmore.</p><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Lansdowne+Pub%2C+9+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking&amp;origin=Dillon%27s%2C+955+Boylston+St%2C+Boston%2C+MA+02115" target="_blank" rel="noopener">Directions to stop 9</a></div></li><li class="stop d-fenway"><div class="dot">9</div><div class="stop-body"><p class="when">8:15–9:00</p><h3>The Lansdowne Pub</h3><p class="meta"><span class="pill d-fenway">Fenway</span> Check-in until 3pm, crawl until 9pm</p><p>Finish at Fenway&#x27;s #1 bar. The cars are a few minutes away.</p></div></li></ol>
-</section>
-
-<section id="bars" data-panel="bars">
-  <h2>All bars</h2>
-  <div class="chips" role="group" aria-label="Show bars open at">
-    <button class="chip" data-t="all" aria-pressed="true">Any time</button>
-    <button class="chip" data-t="now" aria-pressed="false">Open now</button>
-    <button class="chip" data-t="13" aria-pressed="false">1pm</button>
-    <button class="chip" data-t="15" aria-pressed="false">3pm</button>
-    <button class="chip" data-t="17" aria-pressed="false">5pm</button>
-    <button class="chip" data-t="19" aria-pressed="false">7pm</button>
-    <button class="chip" data-t="20.5" aria-pressed="false">8:30pm</button>
-  </div>
-  <p class="filter-note" aria-live="polite"></p>
-  <details class="district d-fenway" open><summary><span class="swatch"></span><span class="dname">Fenway</span><span class="dcount">8 bars</span></summary><p class="dnote">Everything open till 9. Start and finish here.</p><div class="cards"><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#1</span><h3>The Lansdowne Pub</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><div class="tags"><span class="tag tag-route">Our stop 9</span></div><p class="vibe">Big Irish pub that becomes a packed dance party with live cover bands. It&#x27;s the event&#x27;s listed home base and was an official after-party venue in 2025.</p><p class="addr">9 Lansdowne St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Lansdowne+Pub%2C+9+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Lansdowne+Pub%2C+9+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#2</span><h3>Loretta&#x27;s Last Call</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><div class="tags"><span class="tag tag-route">Our stop 2</span></div><p class="vibe">Nashville-style honky-tonk with live country bands and line dancing. One of the most popular bars on Lansdowne, so expect a line.</p><p class="addr">1 Lansdowne St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Loretta%27s+Last+Call%2C+1+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Loretta%27s+Last+Call%2C+1+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#3</span><h3>Game On!</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm (late check-in until 4pm)</p><div class="tags"><span class="tag tag-route">Our stop 3</span></div><p class="vibe">Huge two-level sports bar under the Fenway bleachers. High capacity makes it the easiest big room to get into, and it&#x27;s Fenway&#x27;s late check-in spot.</p><p class="addr">82 Lansdowne St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Game+On%21%2C+82+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Game+On%21%2C+82+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#4</span><h3>Cisco Fenway</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><p class="vibe">Cisco Brewers beer hall with a big outdoor beer garden, opened in 2025. Laid-back Nantucket feel; good for a group, depending on the weather. Across the street from Mighty Squirrel.</p><p class="addr">1301 Boylston St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Cisco+Fenway%2C+1301+Boylston+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Cisco+Fenway%2C+1301+Boylston+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#5</span><h3>Loco Fenway</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><div class="tags"><span class="tag tag-bus">Trolley stop (Route 2)</span></div><p class="vibe">Taqueria and oyster bar with margaritas: the best food stop in Fenway. Party trolleys stopped here at past crawls by the same organizer.</p><p class="addr">61 Brookline Ave, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Loco+Fenway%2C+61+Brookline+Ave%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Loco+Fenway%2C+61+Brookline+Ave%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="14" data-end="21"><div class="bar-head"><span class="rank">#6</span><h3>Mighty Squirrel</h3><span class="close c9">till 9</span></div><p class="window">Crawl 2-9pm (listed as crawl-only, no check-in)</p><div class="tags"><span class="tag tag-route">Our stop 1</span></div><p class="vibe">Two-story brewery taproom with good food. Roomy and more chill than the Lansdowne clubs.</p><p class="note">Your planned check-in. The official list shows Mighty Squirrel as crawl-only from 2pm (it was a check-in spot in 2025). Check the check-in location on your ticket.</p><p class="addr">1 David Ortiz Dr, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Mighty+Squirrel%2C+1+David+Ortiz+Dr%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Mighty+Squirrel%2C+1+David+Ortiz+Dr%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#7</span><h3>Bill&#x27;s Bar</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><p class="vibe">Small, gritty rock/dive club on Lansdowne. Fun once it&#x27;s late, but cramped.</p><p class="addr">5 1/2 Lansdowne St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Bill%27s+Bar%2C+5+1%2F2+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Bill%27s+Bar%2C+5+1%2F2+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#8</span><h3>Cheeky Monkey</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 2pm, crawl until 9pm</p><p class="vibe">Brewpub with pub food and games, next to Lucky Strike. More casual than the clubs around it.</p><p class="addr">3 Lansdowne St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Cheeky+Monkey%2C+3+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Cheeky+Monkey%2C+3+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-fenway" data-start="" data-end=""><div class="bar-head"><span class="rank">?</span><h3>Bleacher Bar (unconfirmed)</h3><span class="close cx">unlisted</span></div><p class="window">Not in the official venue list (shown on the 2026 poster only)</p><p class="vibe">Tiny bar under the bleachers with a window looking onto the Fenway outfield. Iconic but small.</p><p class="note">It&#x27;s on the 2026 poster but missing from the venue list with times. Don&#x27;t count on wristband entry.</p><p class="addr">82A Lansdowne St, Boston, MA 02215</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Bleacher+Bar%2C+82A+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Bleacher+Bar%2C+82A+Lansdowne+St%2C+Boston%2C+MA+02215" target="_blank" rel="noopener">Open in Maps</a></div></article></div><p class="empty">Nothing here is open at that time.</p></details><details class="district d-backbay" open><summary><span class="swatch"></span><span class="dname">Back Bay</span><span class="dcount">4 bars</span></summary><p class="dnote">All four open till 9. Best on the way back.</p><div class="cards"><article class="bar d-backbay" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#1</span><h3>Dillon&#x27;s</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 2pm, crawl until 9pm</p><div class="tags"><span class="tag tag-route">Our stop 8</span></div><p class="vibe">Big bar in an old police station with a large Boylston St patio. Young, loud, social crowd.</p><p class="addr">955 Boylston St, Boston, MA 02115</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dillon%27s%2C+955+Boylston+St%2C+Boston%2C+MA+02115&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Dillon%27s%2C+955+Boylston+St%2C+Boston%2C+MA+02115" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-backbay" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#2</span><h3>Back Bay Social</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 2pm, crawl until 9pm</p><p class="vibe">Two-level bar and restaurant with a young-professional crowd. A bit more polished; good cocktails.</p><p class="addr">867 Boylston St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Back+Bay+Social%2C+867+Boylston+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Back+Bay+Social%2C+867+Boylston+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-backbay" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#3</span><h3>Swingers</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><p class="vibe">New (2026) crazy-golf venue with several cocktail bars and a retro arcade. Something to do besides drink.</p><p class="perk"><b>Perk:</b> Free 30-min arcade card</p><p class="addr">777 Boylston St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Swingers%2C+777+Boylston+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Swingers%2C+777+Boylston+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-backbay" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#4</span><h3>Clery&#x27;s</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 2pm, crawl until 9pm</p><p class="vibe">Classic Irish pub at the Back Bay/South End line and a bar-crawl regular. Laid-back, easy to get a drink.</p><p class="addr">113 Dartmouth St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Clery%27s%2C+113+Dartmouth+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Clery%27s%2C+113+Dartmouth+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article></div><p class="empty">Nothing here is open at that time.</p></details><details class="district d-westend" open><summary><span class="swatch"></span><span class="dname">West End</span><span class="dcount">10 bars</span></summary><p class="dnote">Most packed cluster. The big clubs close at 6.</p><div class="cards"><article class="bar d-westend" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#1</span><h3>The Greatest Bar</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 3pm, crawl until 6pm</p><div class="tags"><span class="tag tag-route">Our stop 4</span></div><p class="vibe">Multi-floor club bar by TD Garden with DJs and a dance floor. One of the most popular party bars in the city.</p><p class="addr">262 Friend St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Greatest+Bar%2C+262+Friend+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Greatest+Bar%2C+262+Friend+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#2</span><h3>Big Night Live</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 3pm, crawl until 6pm (late check-in until 4pm)</p><p class="vibe">Huge concert-hall nightclub with a DJ and production. Biggest capacity in the West End; it was the crawl&#x27;s main hub in 2025.</p><p class="addr">110 Causeway St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Night+Live%2C+110+Causeway+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Big+Night+Live%2C+110+Causeway+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="12" data-end="20"><div class="bar-head"><span class="rank">#3</span><h3>The Harp</h3><span class="close c8">till 8</span></div><p class="window">Check-in until 3pm, crawl until 8pm</p><div class="tags"><span class="tag tag-route">Our stop 5</span><span class="tag tag-bus">Trolley stop (Route 1)</span></div><p class="vibe">Two-floor Irish pub with a dance floor, a favorite before Garden games. Party trolleys stopped here at past crawls.</p><p class="addr">85 Causeway St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Harp%2C+85+Causeway+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Harp%2C+85+Causeway+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#4</span><h3>West End Johnnie&#x27;s</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><p class="vibe">Sports bar by day, DJ party by night, with a young crowd. Open until 9.</p><p class="addr">138 Portland St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=West+End+Johnnie%27s%2C+138+Portland+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=West+End+Johnnie%27s%2C+138+Portland+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="12" data-end="21"><div class="bar-head"><span class="rank">#5</span><h3>Hurricane&#x27;s at the Garden</h3><span class="close c9">till 9</span></div><p class="window">Check-in until 3pm, crawl until 9pm</p><p class="vibe">Two-level Canal St bar with live bands upstairs. Rowdy, fun, open until 9.</p><p class="addr">150 Canal St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Hurricane%27s+at+the+Garden%2C+150+Canal+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Hurricane%27s+at+the+Garden%2C+150+Canal+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#6</span><h3>Banners Kitchen &amp; Tap</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><p class="vibe">Massive sports bar with 100+ TVs and a giant screen. Lots of room.</p><p class="perk"><b>Perk:</b> Special blood-bag cocktails</p><p class="addr">82 Causeway St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Banners+Kitchen+%26+Tap%2C+82+Causeway+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Banners+Kitchen+%26+Tap%2C+82+Causeway+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="12" data-end="26"><div class="bar-head"><span class="rank">#7</span><h3>Causeway</h3><span class="close c9">till close</span></div><p class="window">Check-in until 3pm, crawl until close</p><p class="vibe">Modern bar and restaurant across from the Garden, with a DJ on weekends. Open until close.</p><p class="addr">65 Causeway St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Causeway%2C+65+Causeway+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Causeway%2C+65+Causeway+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="14" data-end="20"><div class="bar-head"><span class="rank">#8</span><h3>Sullivan&#x27;s Tap</h3><span class="close c8">till 8</span></div><p class="window">Crawl 2-8pm</p><p class="vibe">Beloved no-frills dive with cheap beer and a Bruins crowd.</p><p class="addr">168 Canal St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Sullivan%27s+Tap%2C+168+Canal+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%27s+Tap%2C+168+Canal+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="14" data-end="20"><div class="bar-head"><span class="rank">#9</span><h3>Scores</h3><span class="close c8">till 8</span></div><p class="window">Crawl 2-8pm</p><p class="vibe">Two-story sports bar in the old Fours space. Fine, but nothing special.</p><p class="addr">166 Canal St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Scores%2C+166+Canal+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Scores%2C+166+Canal+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-westend" data-start="14" data-end="20"><div class="bar-head"><span class="rank">#10</span><h3>Teddy&#x27;s on the Hill</h3><span class="close c8">till 8</span></div><p class="window">Crawl 2-8pm</p><p class="vibe">Small neighborhood pub on Beacon Hill by the State House. Quiet, and about a 10-minute walk from the Canal St cluster.</p><p class="addr">9 Bowdoin St, Boston, MA 02114</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Teddy%27s+on+the+Hill%2C+9+Bowdoin+St%2C+Boston%2C+MA+02114&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Teddy%27s+on+the+Hill%2C+9+Bowdoin+St%2C+Boston%2C+MA+02114" target="_blank" rel="noopener">Open in Maps</a></div></article></div><p class="empty">Nothing here is open at that time.</p></details><details class="district d-faneuil" open><summary><span class="swatch"></span><span class="dname">Faneuil Hall / Financial District</span><span class="dcount">9 bars</span></summary><p class="dnote">Ned&#x27;s and Howl close at 6. Several stay open till 8.</p><div class="cards"><article class="bar d-faneuil" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#1</span><h3>Ned Devine&#x27;s</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 3pm, crawl until 6pm (late check-in until 4pm)</p><div class="tags"><span class="tag tag-route">Our stop 6</span></div><p class="vibe">Giant Irish pub/club inside Quincy Market with live bands and DJs. The marquee Faneuil Hall stop.</p><p class="addr">1 Faneuil Hall Market St, Boston, MA 02109</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Ned+Devine%27s%2C+1+Faneuil+Hall+Market+St%2C+Boston%2C+MA+02109&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Ned+Devine%27s%2C+1+Faneuil+Hall+Market+St%2C+Boston%2C+MA+02109" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#2</span><h3>Howl at the Moon</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><div class="tags"><span class="tag tag-bus">Trolley stop (Route 1)</span></div><p class="vibe">Dueling pianos and big sing-alongs; a reliably fun group stop. Party trolleys stopped here at past crawls.</p><p class="addr">184 High St, Boston, MA 02110</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Howl+at+the+Moon%2C+184+High+St%2C+Boston%2C+MA+02110&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Howl+at+the+Moon%2C+184+High+St%2C+Boston%2C+MA+02110" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="14" data-end="20"><div class="bar-head"><span class="rank">#3</span><h3>The Green Dragon</h3><span class="close c8">till 8</span></div><p class="window">Crawl 2-8pm</p><p class="vibe">Historic tavern on the Freedom Trail with live Irish music. Cozy and gets tight fast.</p><p class="addr">11 Marshall St, Boston, MA 02108</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Green+Dragon%2C+11+Marshall+St%2C+Boston%2C+MA+02108&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Green+Dragon%2C+11+Marshall+St%2C+Boston%2C+MA+02108" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="14" data-end="20"><div class="bar-head"><span class="rank">#4</span><h3>Versus</h3><span class="close c8">till 8</span></div><p class="window">Crawl 2-8pm</p><p class="vibe">Arcade bar with pinball, Skee-Ball and consoles. In Downtown Crossing, about 10 minutes from Faneuil Hall.</p><p class="perk"><b>Perk:</b> Unlimited gaming with your wristband</p><p class="addr">42 Province St, Boston, MA 02108</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Versus%2C+42+Province+St%2C+Boston%2C+MA+02108&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Versus%2C+42+Province+St%2C+Boston%2C+MA+02108" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="12" data-end="20"><div class="bar-head"><span class="rank">#5</span><h3>White Bull Tavern</h3><span class="close c8">till 8</span></div><p class="window">Check-in until 3pm, crawl until 8pm</p><p class="vibe">Multi-level tavern by City Hall Plaza with sports and a pub crowd. Usually easy to get into.</p><p class="addr">1 Union St, Boston, MA 02108</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=White+Bull+Tavern%2C+1+Union+St%2C+Boston%2C+MA+02108&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=White+Bull+Tavern%2C+1+Union+St%2C+Boston%2C+MA+02108" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="14" data-end="20"><div class="bar-head"><span class="rank">#6</span><h3>North 26</h3><span class="close c8">till 8</span></div><p class="window">Crawl 2-8pm</p><p class="vibe">Hotel bar in the Bostonian Hotel. Calm, good for food and a breather.</p><p class="perk"><b>Perk:</b> $1 oysters, $5 pumpkin beer</p><p class="addr">26 North St, Boston, MA 02109</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=North+26%2C+26+North+St%2C+Boston%2C+MA+02109&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=North+26%2C+26+North+St%2C+Boston%2C+MA+02109" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="12" data-end="26"><div class="bar-head"><span class="rank">#7</span><h3>Alma Cantina</h3><span class="close c9">till close</span></div><p class="window">Check-in until 3pm, crawl until close</p><p class="vibe">Mexican cantina with margaritas and a patio. Open until close.</p><p class="addr">15 Union St, Boston, MA 02108</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Alma+Cantina%2C+15+Union+St%2C+Boston%2C+MA+02108&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Alma+Cantina%2C+15+Union+St%2C+Boston%2C+MA+02108" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#8</span><h3>Off The Rails</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 3pm, crawl until 6pm</p><p class="vibe">New in 2026 in the old Scholars space; a live-music bar from a Worcester group. Few reviews yet, and it&#x27;s in Downtown Crossing, not Faneuil Hall itself.</p><p class="addr">25 School St, Boston, MA 02108</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Off+The+Rails%2C+25+School+St%2C+Boston%2C+MA+02108&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Off+The+Rails%2C+25+School+St%2C+Boston%2C+MA+02108" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-faneuil" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#9</span><h3>The Point</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><p class="vibe">Small, divey bar by the Haymarket/North End edge.</p><p class="addr">147 Hanover St, Boston, MA 02108</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Point%2C+147+Hanover+St%2C+Boston%2C+MA+02108&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Point%2C+147+Hanover+St%2C+Boston%2C+MA+02108" target="_blank" rel="noopener">Open in Maps</a></div></article></div><p class="empty">Nothing here is open at that time.</p></details><details class="district d-theater" open><summary><span class="swatch"></span><span class="dname">Theater District</span><span class="dcount">5 bars</span></summary><p class="dnote">All close at 6 and are quiet by day. Skipping it.</p><div class="cards"><article class="bar d-theater" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#1</span><h3>Ghost Light Tavern</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 3pm, crawl until 6pm (late check-in until 4pm)</p><div class="tags"><span class="tag tag-bus">Likely trolley stop (Route 2)</span></div><p class="vibe">Theater-themed tavern with live music, opened in 2025 in the old Nash Bar space (a past trolley stop). It&#x27;s the district&#x27;s main venue.</p><p class="addr">253 Tremont St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Ghost+Light+Tavern%2C+253+Tremont+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Ghost+Light+Tavern%2C+253+Tremont+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-theater" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#2</span><h3>BSMNT</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 3pm, crawl until 6pm</p><p class="vibe">Sleek basement nightclub (Big Night group) under the W Hotel. Built for late nights, so it can feel empty in the afternoon.</p><p class="addr">100 Stuart St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=BSMNT%2C+100+Stuart+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=BSMNT%2C+100+Stuart+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-theater" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#3</span><h3>Rock Bottom</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><div class="tags"><span class="tag tag-bus">Trolley stop (Route 2)</span></div><p class="vibe">Large brewery restaurant. Roomy and easy to get into, good for food. Party trolleys stopped here at past crawls.</p><p class="addr">115 Stuart St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Rock+Bottom%2C+115+Stuart+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Rock+Bottom%2C+115+Stuart+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-theater" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#4</span><h3>Rock &amp; Rye</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><p class="vibe">Whiskey-and-rock American bar. Mid-size, low-key.</p><p class="addr">57 Stuart St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Rock+%26+Rye%2C+57+Stuart+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Rock+%26+Rye%2C+57+Stuart+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-theater" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#5</span><h3>The Tam</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><p class="vibe">Tiny, legendary dive with cheap drinks. Room for maybe 40 people.</p><p class="addr">222 Tremont St, Boston, MA 02116</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Tam%2C+222+Tremont+St%2C+Boston%2C+MA+02116&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Tam%2C+222+Tremont+St%2C+Boston%2C+MA+02116" target="_blank" rel="noopener">Open in Maps</a></div></article></div><p class="empty">Nothing here is open at that time.</p></details><details class="district d-seaport" open><summary><span class="swatch"></span><span class="dname">Seaport</span><span class="dcount">5 bars</span></summary><p class="dnote">Pauly D at The Grand, 5:30.</p><div class="cards"><article class="bar d-seaport" data-start="12" data-end="20"><div class="bar-head"><span class="rank">#1</span><h3>The Grand</h3><span class="close c8">till 8</span></div><p class="window">Check-in until 2pm, crawl until 8pm (late check-in until 4pm)</p><div class="tags"><span class="tag tag-route">Our stop 7</span><span class="tag tag-bus">Likely trolley stop (Route 2)</span></div><p class="vibe">Seaport&#x27;s flagship nightclub. DJ PAULY D plays at 5:30pm and every wristband gets in, so arrive early because it will hit capacity.</p><p class="addr">58 Seaport Blvd, Boston, MA 02210</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Grand%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=The+Grand%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-seaport" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#2</span><h3>Scorpion Bar</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 2pm, crawl until 6pm</p><div class="tags"><span class="tag tag-bus">Trolley stop (Route 1)</span></div><p class="vibe">Tequila bar and club on the floor below The Grand. A good place to wait before Pauly D, and a past trolley stop.</p><p class="addr">58 Seaport Blvd, Boston, MA 02210</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Scorpion+Bar%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Scorpion+Bar%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-seaport" data-start="14" data-end="18"><div class="bar-head"><span class="rank">#3</span><h3>Envoy Rooftop (Lookout)</h3><span class="close c6">till 6</span></div><p class="window">Crawl 2-6pm</p><p class="vibe">Rooftop bar with skyline views at the Envoy Hotel. Small capacity, so lines build quickly, and it&#x27;s chilly at the end of October.</p><p class="addr">70 Sleeper St, Boston, MA 02210</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Envoy+Rooftop%2C+70+Sleeper+St%2C+Boston%2C+MA+02210&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Envoy+Rooftop%2C+70+Sleeper+St%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-seaport" data-start="12" data-end="18"><div class="bar-head"><span class="rank">#4</span><h3>Lucky&#x27;s Lounge</h3><span class="close c6">till 6</span></div><p class="window">Check-in until 2pm, crawl until 6pm</p><p class="vibe">Retro, Sinatra-style speakeasy lounge in Fort Point. Dark and fun, with a smaller crowd.</p><p class="addr">355 Congress St, Boston, MA 02210</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Lucky%27s+Lounge%2C+355+Congress+St%2C+Boston%2C+MA+02210&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Lucky%27s+Lounge%2C+355+Congress+St%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">Open in Maps</a></div></article><article class="bar d-seaport" data-start="12" data-end="20"><div class="bar-head"><span class="rank">#5</span><h3>Urban Wild (actually Charlestown)</h3><span class="close c8">till 8</span></div><p class="window">Check-in until 3pm, crawl until 8pm</p><p class="vibe">Bowling, live music and a beer garden. Listed under Seaport but it&#x27;s in Charlestown (Hood Park), about 15 minutes&#x27; walk north of TD Garden and roughly 3 miles from The Grand.</p><p class="perk"><b>Perk:</b> Free 30 min of bowling</p><p class="addr">100 Hood Park Dr, Charlestown, MA 02129</p><div class="actions"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Urban+Wild%2C+100+Hood+Park+Dr%2C+Charlestown%2C+MA+02129&amp;travelmode=walking" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Urban+Wild%2C+100+Hood+Park+Dr%2C+Charlestown%2C+MA+02129" target="_blank" rel="noopener">Open in Maps</a></div></article></div><p class="empty">Nothing here is open at that time.</p></details>
-</section>
-
-<section id="trolleys" data-panel="trolleys">
-  <h2>Free party trolleys</h2>
-  <div class="alert" style="margin-bottom:14px"><b>These are likely stops, not official ones.</b>This year's listing doesn't name stops, so these come from the same organizer's 2024 and 2025 crawls. Those years, 2–3 trolleys looped each route from 2pm to 6pm only. Check the night-before email for the real map.</div>
-  <div class="card">
-    <h3>Route 1 · West End → Faneuil Hall → Seaport</h3>
-    <span class="conf high">High confidence</span>
-    <ol class="route-stops">
-      <li><div>The Harp<small>85 Causeway St · West End</small></div></li>
-      <li><div>Howl at the Moon<small>184 High St · Faneuil Hall / FiDi</small></div></li>
-      <li><div>Scorpion Bar<small>58 Seaport Blvd · same building as The Grand</small></div></li>
-    </ol>
-    <p>It then loops back to The Harp. These were the same three stops in 2024 and 2025, and all three are 2026 venues.</p>
-  </div>
-  <div class="card">
-    <h3>Route 2 · Fenway → Theater District → Seaport</h3>
-    <span class="conf med">Medium confidence</span>
-    <ol class="route-stops">
-      <li><div>Loco Fenway<small>61 Brookline Ave · Fenway</small></div></li>
-      <li><div>Ghost Light Tavern<small>253 Tremont St · the old Nash Bar stop, same address</small></div></li>
-      <li><div>The Grand / Scorpion Bar (best guess)<small>58 Seaport Blvd · 2025's Seaport stop, Empire, isn't in the crawl this year</small></div></li>
-      <li><div>Rock Bottom<small>115 Stuart St · Theater District</small></div></li>
-    </ol>
-    <p>It then loops back to Loco Fenway. No past trolley served Back Bay.</p>
-  </div>
-  <div class="card">
-    <h3>Getting back to Fenway after Pauly D</h3>
-    <p>If you leave The Grand by about 6, you might catch a last Route 2 loop to Loco Fenway. Don't count on it.</p>
-    <p><b>T, ~30–35 min:</b> walk to South Station, take the Red Line to Park St, then the Green Line (B/C/D) to Copley for Back Bay or Kenmore for Fenway.</p>
-    <p><b>Uber/Lyft, 15–20 min:</b> expect heavy Halloween surge pricing.</p>
-    <div class="actions">
-      <a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dillon%27s%2C+955+Boylston+St%2C+Boston%2C+MA+02115&amp;travelmode=transit&amp;origin=The+Grand%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">T to Dillon's</a>
-      <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Lansdowne+Pub%2C+9+Lansdowne+St%2C+Boston%2C+MA+02215&amp;travelmode=transit&amp;origin=The+Grand%2C+58+Seaport+Blvd%2C+Boston%2C+MA+02210" target="_blank" rel="noopener">T to Lansdowne St</a>
+  <div class="panel" id="panel-plan" role="tabpanel">
+    <div class="legend">
+      <span><i style="background:var(--walk)"></i>Walk</span>
+      <span><i style="background:var(--trolley1)"></i>Trolley 1</span>
+      <span><i style="background:var(--trolley2)"></i>Trolley 2</span>
+      <span><i style="background:var(--green)"></i>Green Line</span>
+      <span><i style="background:var(--red)"></i>Red Line</span>
     </div>
+    <div id="plan"></div>
+  </div>
+  <div class="panel" id="panel-near" role="tabpanel" hidden>
+    <button class="btnwide" id="near-go">📍 Find crawl bars near me</button>
+    <p class="filter-note" id="near-note" style="margin-top:10px">Uses your location and the current time to list the closest bars where the wristband still gets you in free.</p>
+    <div id="near-list"></div>
+  </div>
+  <div class="panel" id="panel-bars" role="tabpanel" hidden>
+    <div class="chips" id="chips" role="group" aria-label="Show free entry at">
+      <button class="chip" data-t="all" aria-pressed="true">Any time</button>
+      <button class="chip" data-t="now" aria-pressed="false">Now</button>
+      <button class="chip" data-t="13" aria-pressed="false">1pm</button>
+      <button class="chip" data-t="15" aria-pressed="false">3pm</button>
+      <button class="chip" data-t="17" aria-pressed="false">5pm</button>
+      <button class="chip" data-t="18.5" aria-pressed="false">6:30pm</button>
+      <button class="chip" data-t="20.5" aria-pressed="false">8:30pm</button>
+      <button class="chip" data-t="22" aria-pressed="false">10pm</button>
+    </div>
+    <p class="filter-note" id="filter-note"></p>
+    <div id="bars"></div>
+  </div>
+  <div class="panel" id="panel-info" role="tabpanel" hidden>
+    <div class="card warn">
+      <h3>Good to know</h3>
+      <ul>
+        <li><b>Free entry isn't closing time.</b> The wristband gets you in free until each bar's cutoff. Be inside by then and you can stay. After it, expect a cover.</li>
+        <li><b>Big clubs may clear out</b> after their window: The Grand, Big Night Live, The Greatest Bar, BSMNT.</li>
+        <li><b>Check your ticket's check-in spot.</b> Mighty Squirrel is listed as crawl-only this year. Late check-in until 4: Game On, Big Night Live, Ned Devine's, Ghost Light, The Grand.</li>
+        <li><b>Trolleys</b> are based on past years (about 2–6pm). The night-before email has the real map.</li>
+        <li><b>No Ubers.</b> On the T, everyone taps their own card or phone. Trains run until about 1am.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Free entry after 6</h3>
+      <p><b>Until close:</b> Causeway, Alma Cantina</p>
+      <p><b>Until 9:</b> all of Fenway and Back Bay, West End Johnnie's, Hurricane's</p>
+      <p><b>Until 8:</b> The Grand, The Harp, Green Dragon, White Bull, North 26, Versus, Sullivan's, Scores, Teddy's</p>
+    </div>
+    <div class="card">
+      <h3>Late-night tickets</h3>
+      <p><b>Pauly D at Big Night Live</b>, 10pm–2am (West End)</p>
+      <p><b>The Point's Halloween party</b>, 9pm–2am (Faneuil Hall), ~$26–34. Sells out every year.</p>
+    </div>
+    <p class="small">From the official Eventbrite listing, checked Oct 28. Ranks are ours, within each district. Walk times are estimates. Map tiles © Esri, OpenStreetMap contributors.</p>
   </div>
 </section>
-</main>
+<noscript><div style="position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:#121015;color:#fff;z-index:2000;text-align:center">This map needs JavaScript. Open the link in Safari or Chrome.</div></noscript>
 
-<footer class="wrap">
-  <p>Bars and crawl windows come from the <a href="https://www.eventbrite.com/e/2026-bostons-official-halloween-bar-crawl-w-dj-pauly-d-tickets-1998163180863" target="_blank" rel="noopener">official Eventbrite listing</a>, checked Oct 28. Times can change on the day.</p>
-  <p>Popularity ranks are within each district. They reflect each bar's reputation and size and how much the organizer promotes it.</p>
-</footer>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
+const DATA = {"districts":[{"id":"fenway","name":"Fenway","color":"E65100"},{"id":"backbay","name":"Back Bay","color":"1565C0"},{"id":"westend","name":"West End","color":"2E7D32"},{"id":"faneuil","name":"Faneuil Hall / Financial District","color":"6A1B9A"},{"id":"theater","name":"Theater District","color":"C62828"},{"id":"seaport","name":"Seaport","color":"00838F"}],"venues":[{"id":"the-lansdowne-pub","name":"The Lansdowne Pub","short":"The Lansdowne Pub","d":"fenway","rank":1,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Big Irish pub that becomes a packed dance party with live cover bands. It's the event's listed home base and was an official after-party venue in 2025.","perk":"","note":"","addr":"9 Lansdowne St, Boston, MA 02215","lat":42.34734,"lon":-71.09515,"clears":false,"trolley":"","web":"https://www.lansdownepubboston.com/"},{"id":"lorettas-last-call","name":"Loretta's Last Call","short":"Loretta's Last Call","d":"fenway","rank":2,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Nashville-style honky-tonk with live country bands and line dancing. One of the most popular bars on Lansdowne, so expect a line.","perk":"","note":"","addr":"1 Lansdowne St, Boston, MA 02215","lat":42.34733,"lon":-71.09453,"clears":false,"trolley":"","web":"https://www.lorettaslastcall.com/"},{"id":"game-on","name":"Game On!","short":"Game On!","d":"fenway","rank":3,"window":"Check-in until 3pm, crawl until 9pm (late check-in until 4pm)","start":12,"end":21,"vibe":"Huge two-level sports bar under the Fenway bleachers. High capacity makes it the easiest big room to get into, and it's Fenway's late check-in spot.","perk":"","note":"","addr":"82 Lansdowne St, Boston, MA 02215","lat":42.34705,"lon":-71.09849,"clears":false,"trolley":"","web":"https://www.gameonboston.com/"},{"id":"cisco-fenway","name":"Cisco Fenway","short":"Cisco Fenway","d":"fenway","rank":4,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Cisco Brewers beer hall with a big outdoor beer garden, opened in 2025. Laid-back Nantucket feel; good for a group, depending on the weather. Across the street from Mighty Squirrel.","perk":"","note":"","addr":"1301 Boylston St, Boston, MA 02215","lat":42.34475,"lon":-71.09839,"clears":false,"trolley":"","web":"https://www.ciscobrewers.com/"},{"id":"loco-fenway","name":"Loco Fenway","short":"Loco Fenway","d":"fenway","rank":5,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Taqueria and oyster bar with margaritas: the best food stop in Fenway. Party trolleys stopped here at past crawls by the same organizer.","perk":"","note":"","addr":"61 Brookline Ave, Boston, MA 02215","lat":42.347,"lon":-71.09899,"clears":false,"trolley":"Route 2 stop","web":""},{"id":"mighty-squirrel","name":"Mighty Squirrel","short":"Mighty Squirrel","d":"fenway","rank":6,"window":"Crawl 2-9pm (listed as crawl-only, no check-in)","start":14,"end":21,"vibe":"Two-story brewery taproom with good food. Roomy and more chill than the Lansdowne clubs.","perk":"","note":"Your planned check-in. The official list shows Mighty Squirrel as crawl-only from 2pm (it was a check-in spot in 2025). Check the check-in location on your ticket.","addr":"1 David Ortiz Dr, Boston, MA 02215","lat":42.34706,"lon":-71.10119,"clears":false,"trolley":"","web":"https://www.mightysquirrel.com/"},{"id":"bills-bar","name":"Bill's Bar","short":"Bill's Bar","d":"fenway","rank":7,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Small, gritty rock/dive club on Lansdowne. Fun once it's late, but cramped.","perk":"","note":"","addr":"5 1/2 Lansdowne St, Boston, MA 02215","lat":42.34732,"lon":-71.0949,"clears":false,"trolley":"","web":"https://www.billsbarboston.com/"},{"id":"cheeky-monkey","name":"Cheeky Monkey","short":"Cheeky Monkey","d":"fenway","rank":8,"window":"Check-in until 2pm, crawl until 9pm","start":12,"end":21,"vibe":"Brewpub with pub food and games, next to Lucky Strike. More casual than the clubs around it.","perk":"","note":"","addr":"3 Lansdowne St, Boston, MA 02215","lat":42.34732,"lon":-71.09471,"clears":false,"trolley":"","web":"https://www.luckystrikeent.com/location/cheeky-monkey-brewing-co"},{"id":"bleacher-bar-unconfirmed","name":"Bleacher Bar (unconfirmed)","short":"Bleacher Bar","d":"fenway","rank":99,"window":"Not in the official venue list (shown on the 2026 poster only)","start":12,"end":null,"vibe":"Tiny bar under the bleachers with a window looking onto the Fenway outfield. Iconic but small.","perk":"","note":"It's on the 2026 poster but missing from the venue list with times. Don't count on wristband entry.","addr":"82A Lansdowne St, Boston, MA 02215","lat":42.34704,"lon":-71.09671,"clears":false,"trolley":"","web":"https://www.bleacherbarboston.com/"},{"id":"dillons","name":"Dillon's","short":"Dillon's","d":"backbay","rank":1,"window":"Check-in until 2pm, crawl until 9pm","start":12,"end":21,"vibe":"Big bar in an old police station with a large Boylston St patio. Young, loud, social crowd.","perk":"","note":"","addr":"955 Boylston St, Boston, MA 02115","lat":42.34796,"lon":-71.08589,"clears":false,"trolley":"","web":"https://www.dillonsboston.com/"},{"id":"back-bay-social","name":"Back Bay Social","short":"Back Bay Social","d":"backbay","rank":2,"window":"Check-in until 2pm, crawl until 9pm","start":12,"end":21,"vibe":"Two-level bar and restaurant with a young-professional crowd. A bit more polished; good cocktails.","perk":"","note":"","addr":"867 Boylston St, Boston, MA 02116","lat":42.34867,"lon":-71.08341,"clears":false,"trolley":"","web":"https://www.backbaysocial.com/"},{"id":"swingers","name":"Swingers","short":"Swingers","d":"backbay","rank":3,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"New (2026) crazy-golf venue with several cocktail bars and a retro arcade. Something to do besides drink.","perk":"Free 30-min arcade card","note":"","addr":"777 Boylston St, Boston, MA 02116","lat":42.34929,"lon":-71.08141,"clears":false,"trolley":"","web":"https://www.swingers.club/us/locations/boston"},{"id":"clerys","name":"Clery's","short":"Clery's","d":"backbay","rank":4,"window":"Check-in until 2pm, crawl until 9pm","start":12,"end":21,"vibe":"Classic Irish pub at the Back Bay/South End line and a bar-crawl regular. Laid-back, easy to get a drink.","perk":"","note":"","addr":"113 Dartmouth St, Boston, MA 02116","lat":42.34615,"lon":-71.07518,"clears":false,"trolley":"","web":"https://www.clerysboston.com/"},{"id":"the-greatest-bar","name":"The Greatest Bar","short":"The Greatest Bar","d":"westend","rank":1,"window":"Check-in until 3pm, crawl until 6pm","start":12,"end":18,"vibe":"Multi-floor club bar by TD Garden with DJs and a dance floor. One of the most popular party bars in the city.","perk":"","note":"","addr":"262 Friend St, Boston, MA 02114","lat":42.36456,"lon":-71.06142,"clears":true,"trolley":"","web":"https://thegreatestbar.com/"},{"id":"big-night-live","name":"Big Night Live","short":"Big Night Live","d":"westend","rank":2,"window":"Check-in until 3pm, crawl until 6pm (late check-in until 4pm)","start":12,"end":18,"vibe":"Huge concert-hall nightclub with a DJ and production. Biggest capacity in the West End; it was the crawl's main hub in 2025.","perk":"","note":"","addr":"110 Causeway St, Boston, MA 02114","lat":42.36593,"lon":-71.06145,"clears":true,"trolley":"","web":"https://bignightlive.com/"},{"id":"the-harp","name":"The Harp","short":"The Harp","d":"westend","rank":3,"window":"Check-in until 3pm, crawl until 8pm","start":12,"end":20,"vibe":"Two-floor Irish pub with a dance floor, a favorite before Garden games. Party trolleys stopped here at past crawls.","perk":"","note":"","addr":"85 Causeway St, Boston, MA 02114","lat":42.36458,"lon":-71.06244,"clears":false,"trolley":"Route 1 stop","web":"https://www.theharp.com/"},{"id":"west-end-johnnies","name":"West End Johnnie's","short":"West End Johnnie's","d":"westend","rank":4,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Sports bar by day, DJ party by night, with a young crowd. Open until 9.","perk":"","note":"","addr":"138 Portland St, Boston, MA 02114","lat":42.36368,"lon":-71.06132,"clears":false,"trolley":"","web":"https://www.westendjohnnies.com/"},{"id":"hurricanes-at-the-garden","name":"Hurricane's at the Garden","short":"Hurricane's at the Garden","d":"westend","rank":5,"window":"Check-in until 3pm, crawl until 9pm","start":12,"end":21,"vibe":"Two-level Canal St bar with live bands upstairs. Rowdy, fun, open until 9.","perk":"","note":"","addr":"150 Canal St, Boston, MA 02114","lat":42.36484,"lon":-71.06073,"clears":false,"trolley":"","web":"https://www.hurricanesboston.com/"},{"id":"banners-kitchen-tap","name":"Banners Kitchen & Tap","short":"Banners Kitchen & Tap","d":"westend","rank":6,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Massive sports bar with 100+ TVs and a giant screen. Lots of room.","perk":"Special blood-bag cocktails","note":"","addr":"82 Causeway St, Boston, MA 02114","lat":42.36555,"lon":-71.06164,"clears":false,"trolley":"","web":"https://www.bannerskitchenandtap.com/"},{"id":"causeway","name":"Causeway","short":"Causeway","d":"westend","rank":7,"window":"Check-in until 3pm, crawl until close","start":12,"end":26,"vibe":"Modern bar and restaurant across from the Garden, with a DJ on weekends. Open until close.","perk":"","note":"","addr":"65 Causeway St, Boston, MA 02114","lat":42.3645,"lon":-71.06265,"clears":false,"trolley":"","web":"https://www.causeway.boston/"},{"id":"sullivans-tap","name":"Sullivan's Tap","short":"Sullivan's Tap","d":"westend","rank":8,"window":"Crawl 2-8pm","start":14,"end":20,"vibe":"Beloved no-frills dive with cheap beer and a Bruins crowd.","perk":"","note":"","addr":"168 Canal St, Boston, MA 02114","lat":42.36511,"lon":-71.061,"clears":false,"trolley":"","web":""},{"id":"scores","name":"Scores","short":"Scores","d":"westend","rank":9,"window":"Crawl 2-8pm","start":14,"end":20,"vibe":"Two-story sports bar in the old Fours space. Fine, but nothing special.","perk":"","note":"","addr":"166 Canal St, Boston, MA 02114","lat":42.36502,"lon":-71.06094,"clears":false,"trolley":"","web":""},{"id":"teddys-on-the-hill","name":"Teddy's on the Hill","short":"Teddy's on the Hill","d":"westend","rank":10,"window":"Crawl 2-8pm","start":14,"end":20,"vibe":"Small neighborhood pub on Beacon Hill by the State House. Quiet, and about a 10-minute walk from the Canal St cluster.","perk":"","note":"","addr":"9 Bowdoin St, Boston, MA 02114","lat":42.361,"lon":-71.0632,"clears":false,"trolley":"","web":"https://www.teddysboston.com/"},{"id":"ned-devines","name":"Ned Devine's","short":"Ned Devine's","d":"faneuil","rank":1,"window":"Check-in until 3pm, crawl until 6pm (late check-in until 4pm)","start":12,"end":18,"vibe":"Giant Irish pub/club inside Quincy Market with live bands and DJs. The marquee Faneuil Hall stop.","perk":"","note":"","addr":"1 Faneuil Hall Market St, Boston, MA 02109","lat":42.36021,"lon":-71.05491,"clears":false,"trolley":"","web":"https://www.neddevinesboston.com/"},{"id":"howl-at-the-moon","name":"Howl at the Moon","short":"Howl at the Moon","d":"faneuil","rank":2,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Dueling pianos and big sing-alongs; a reliably fun group stop. Party trolleys stopped here at past crawls.","perk":"","note":"","addr":"184 High St, Boston, MA 02110","lat":42.35659,"lon":-71.05277,"clears":false,"trolley":"Route 1 stop","web":"https://home.howlatthemoon.com/boston/"},{"id":"the-green-dragon","name":"The Green Dragon","short":"The Green Dragon","d":"faneuil","rank":3,"window":"Crawl 2-8pm","start":14,"end":20,"vibe":"Historic tavern on the Freedom Trail with live Irish music. Cozy and gets tight fast.","perk":"","note":"","addr":"11 Marshall St, Boston, MA 02108","lat":42.36151,"lon":-71.05686,"clears":false,"trolley":"","web":"https://www.greendragonboston.com/"},{"id":"versus","name":"Versus","short":"Versus","d":"faneuil","rank":4,"window":"Crawl 2-8pm","start":14,"end":20,"vibe":"Arcade bar with pinball, Skee-Ball and consoles. In Downtown Crossing, about 10 minutes from Faneuil Hall.","perk":"Unlimited gaming with your wristband","note":"","addr":"42 Province St, Boston, MA 02108","lat":42.35686,"lon":-71.05996,"clears":false,"trolley":"","web":"https://www.versusboston.com/"},{"id":"white-bull-tavern","name":"White Bull Tavern","short":"White Bull Tavern","d":"faneuil","rank":5,"window":"Check-in until 3pm, crawl until 8pm","start":12,"end":20,"vibe":"Multi-level tavern by City Hall Plaza with sports and a pub crowd. Usually easy to get into.","perk":"","note":"","addr":"1 Union St, Boston, MA 02108","lat":42.36071,"lon":-71.05674,"clears":false,"trolley":"","web":"https://www.thewhitebulltavern.com/"},{"id":"north-26","name":"North 26","short":"North 26","d":"faneuil","rank":6,"window":"Crawl 2-8pm","start":14,"end":20,"vibe":"Hotel bar in the Bostonian Hotel. Calm, good for food and a breather.","perk":"$1 oysters, $5 pumpkin beer","note":"","addr":"26 North St, Boston, MA 02109","lat":42.36063,"lon":-71.05624,"clears":false,"trolley":"","web":""},{"id":"alma-cantina","name":"Alma Cantina","short":"Alma Cantina","d":"faneuil","rank":7,"window":"Check-in until 3pm, crawl until close","start":12,"end":26,"vibe":"Mexican cantina with margaritas and a patio. Open until close.","perk":"","note":"","addr":"15 Union St, Boston, MA 02108","lat":42.36086,"lon":-71.0568,"clears":false,"trolley":"","web":""},{"id":"off-the-rails","name":"Off The Rails","short":"Off The Rails","d":"faneuil","rank":8,"window":"Check-in until 3pm, crawl until 6pm","start":12,"end":18,"vibe":"New in 2026 in the old Scholars space; a live-music bar from a Worcester group. Few reviews yet, and it's in Downtown Crossing, not Faneuil Hall itself.","perk":"","note":"","addr":"25 School St, Boston, MA 02108","lat":42.35773,"lon":-71.05892,"clears":false,"trolley":"","web":"https://www.offtherailsboston.com/"},{"id":"the-point","name":"The Point","short":"The Point","d":"faneuil","rank":9,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Small, divey bar by the Haymarket/North End edge.","perk":"","note":"","addr":"147 Hanover St, Boston, MA 02108","lat":42.36177,"lon":-71.05696,"clears":false,"trolley":"","web":"https://www.thepointboston.com/"},{"id":"ghost-light-tavern","name":"Ghost Light Tavern","short":"Ghost Light Tavern","d":"theater","rank":1,"window":"Check-in until 3pm, crawl until 6pm (late check-in until 4pm)","start":12,"end":18,"vibe":"Theater-themed tavern with live music, opened in 2025 in the old Nash Bar space (a past trolley stop). It's the district's main venue.","perk":"","note":"","addr":"253 Tremont St, Boston, MA 02116","lat":42.35051,"lon":-71.06533,"clears":false,"trolley":"Route 2 stop (likely)","web":"https://www.ghostlighttavern.com/"},{"id":"bsmnt","name":"BSMNT","short":"BSMNT","d":"theater","rank":2,"window":"Check-in until 3pm, crawl until 6pm","start":12,"end":18,"vibe":"Sleek basement nightclub (Big Night group) under the W Hotel. Built for late nights, so it can feel empty in the afternoon.","perk":"","note":"","addr":"100 Stuart St, Boston, MA 02116","lat":42.35083,"lon":-71.06557,"clears":true,"trolley":"","web":"https://www.bsmntboston.com/"},{"id":"rock-bottom","name":"Rock Bottom","short":"Rock Bottom","d":"theater","rank":3,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Large brewery restaurant. Roomy and easy to get into, good for food. Party trolleys stopped here at past crawls.","perk":"","note":"","addr":"115 Stuart St, Boston, MA 02116","lat":42.35125,"lon":-71.06545,"clears":false,"trolley":"Route 2 stop","web":"https://www.rockbottom.com/"},{"id":"rock-rye","name":"Rock & Rye","short":"Rock & Rye","d":"theater","rank":4,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Whiskey-and-rock American bar. Mid-size, low-key.","perk":"","note":"","addr":"57 Stuart St, Boston, MA 02116","lat":42.35124,"lon":-71.06419,"clears":false,"trolley":"","web":"https://www.rocknryebar.com/"},{"id":"the-tam","name":"The Tam","short":"The Tam","d":"theater","rank":5,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Tiny, legendary dive with cheap drinks. Room for maybe 40 people.","perk":"","note":"","addr":"222 Tremont St, Boston, MA 02116","lat":42.35152,"lon":-71.06462,"clears":false,"trolley":"","web":""},{"id":"the-grand","name":"The Grand","short":"The Grand","d":"seaport","rank":1,"window":"Check-in until 2pm, crawl until 8pm (late check-in until 4pm)","start":12,"end":20,"vibe":"Seaport's flagship nightclub. DJ PAULY D plays at 5:30pm and every wristband gets in, so arrive early because it will hit capacity.","perk":"DJ Pauly D 5:30pm","note":"","addr":"58 Seaport Blvd, Boston, MA 02210","lat":42.35317,"lon":-71.04754,"clears":true,"trolley":"Route 2 stop (likely)","web":"https://thegrandboston.com/"},{"id":"scorpion-bar","name":"Scorpion Bar","short":"Scorpion Bar","d":"seaport","rank":2,"window":"Check-in until 2pm, crawl until 6pm","start":12,"end":18,"vibe":"Tequila bar and club on the floor below The Grand. A good place to wait before Pauly D, and a past trolley stop.","perk":"","note":"","addr":"58 Seaport Blvd, Boston, MA 02210","lat":42.35305,"lon":-71.04751,"clears":false,"trolley":"Route 1 stop","web":"https://www.scorpionboston.com/"},{"id":"envoy-rooftop-lookout","name":"Envoy Rooftop (Lookout)","short":"Envoy Rooftop","d":"seaport","rank":3,"window":"Crawl 2-6pm","start":14,"end":18,"vibe":"Rooftop bar with skyline views at the Envoy Hotel. Small capacity, so lines build quickly, and it's chilly at the end of October.","perk":"","note":"","addr":"70 Sleeper St, Boston, MA 02210","lat":42.35388,"lon":-71.04826,"clears":false,"trolley":"","web":"https://www.theenvoyhotel.com/"},{"id":"luckys-lounge","name":"Lucky's Lounge","short":"Lucky's Lounge","d":"seaport","rank":4,"window":"Check-in until 2pm, crawl until 6pm","start":12,"end":18,"vibe":"Retro, Sinatra-style speakeasy lounge in Fort Point. Dark and fun, with a smaller crowd.","perk":"","note":"","addr":"355 Congress St, Boston, MA 02210","lat":42.35018,"lon":-71.04844,"clears":false,"trolley":"","web":"https://www.luckyslounge.com/"},{"id":"urban-wild-actually-charlestown","name":"Urban Wild (actually Charlestown)","short":"Urban Wild","d":"seaport","rank":5,"window":"Check-in until 3pm, crawl until 8pm","start":12,"end":20,"vibe":"Bowling, live music and a beer garden. Listed under Seaport but it's in Charlestown (Hood Park), about 15 minutes' walk north of TD Garden and roughly 3 miles from The Grand.","perk":"Free 30 min of bowling","note":"","addr":"100 Hood Park Dr, Charlestown, MA 02129","lat":42.37936,"lon":-71.07375,"clears":false,"trolley":"","web":"https://www.urbanwildboston.com/"}],"legs":{"ms_lor":{"parts":[{"mode":"walk","coords":[[42.34704,-71.10116],[42.34694,-71.10103],[42.34708,-71.10081],[42.34733,-71.10002],[42.34681,-71.09909],[42.34715,-71.09873],[42.34708,-71.09859],[42.34726,-71.09836],[42.34724,-71.09453]],"mins":8}],"walkMins":8},"lor_go":{"parts":[{"mode":"walk","coords":[[42.34724,-71.09453],[42.34726,-71.09836],[42.34709,-71.09857]],"mins":5}],"walkMins":5},"go_train_we":{"parts":[{"mode":"walk","coords":[[42.34709,-71.09857],[42.34846,-71.0971],[42.34866,-71.09696],[42.34885,-71.09695],[42.3489,-71.09522]],"mins":5},{"mode":"green","coords":[[42.34895,-71.09517],[42.34789,-71.0879],[42.34997,-71.07745],[42.3519,-71.07089],[42.35302,-71.06459],[42.35639,-71.06242],[42.3597,-71.05921],[42.36302,-71.05829],[42.36558,-71.06129]],"from":"Kenmore","to":"North Station"},{"mode":"walk","coords":[[42.36557,-71.06129],[42.36554,-71.06135],[42.36536,-71.06116],[42.36505,-71.06175],[42.36464,-71.0613]],"mins":2}],"walkMins":7},"go_r2_sea":{"parts":[{"mode":"walk","coords":[[42.34709,-71.09857],[42.34715,-71.09873],[42.34696,-71.09893]],"mins":1},{"mode":"trolley2","coords":[[42.34692,-71.09885],[42.34718,-71.09858],[42.3472,-71.09469],[42.3471,-71.09445],[42.34743,-71.09408],[42.34752,-71.09385],[42.34753,-71.08988],[42.34744,-71.08954],[42.34689,-71.08922],[42.3519,-71.0707],[42.35253,-71.06733],[42.35237,-71.06456],[42.35,-71.06525],[42.34863,-71.06554],[42.34842,-71.06408],[42.34945,-71.06376],[42.35107,-71.06294],[42.35239,-71.06259],[42.35256,-71.06067],[42.35254,-71.05953],[42.35238,-71.058],[42.3522,-71.05753],[42.35186,-71.05587],[42.35263,-71.05541],[42.35301,-71.05496],[42.35476,-71.05142],[42.35436,-71.0509],[42.35313,-71.04841],[42.353,-71.04827],[42.35226,-71.04667],[42.35234,-71.04658],[42.3529,-71.04778]]}],"walkMins":1},"sea_r1_harp":{"parts":[{"mode":"trolley1","coords":[[42.35285,-71.04768],[42.35319,-71.04854],[42.35436,-71.0509],[42.35507,-71.05172],[42.3553,-71.05217],[42.35615,-71.05332],[42.35765,-71.05529],[42.359,-71.05591],[42.35888,-71.0568],[42.35905,-71.0568],[42.36133,-71.05748],[42.36168,-71.05769],[42.36194,-71.05799],[42.36263,-71.05854],[42.36289,-71.05908],[42.36303,-71.0598],[42.36398,-71.06336],[42.36428,-71.06333],[42.36451,-71.06289],[42.3643,-71.06266],[42.36444,-71.06245],[42.36453,-71.06253]]},{"mode":"walk","coords":[[42.36453,-71.06253],[42.36444,-71.06245],[42.36439,-71.06248],[42.36432,-71.06262],[42.36449,-71.0628],[42.36505,-71.06175],[42.36464,-71.0613]],"mins":3}],"walkMins":3},"sea_walk_we":{"parts":[{"mode":"walk","coords":[[42.35299,-71.0477],[42.35334,-71.0484],[42.35329,-71.04845],[42.35345,-71.0488],[42.3545,-71.05086],[42.35481,-71.0512],[42.35536,-71.05204],[42.35537,-71.05214],[42.35602,-71.05307],[42.3561,-71.05309],[42.35742,-71.0549],[42.35768,-71.05521],[42.35776,-71.05522],[42.35774,-71.05541],[42.35892,-71.05594],[42.3588,-71.05663],[42.36151,-71.05746],[42.36234,-71.05814],[42.36246,-71.05813],[42.3628,-71.05867],[42.36298,-71.05911],[42.36308,-71.05919],[42.36316,-71.05976],[42.36321,-71.05969],[42.36464,-71.0613]],"mins":25}],"walkMins":25},"gb_harp":{"parts":[{"mode":"walk","coords":[[42.36464,-71.0613],[42.36505,-71.06175],[42.36449,-71.0628],[42.36432,-71.06262],[42.36439,-71.06248],[42.36444,-71.06245],[42.36453,-71.06253]],"mins":3}],"walkMins":3},"harp_r1_howl":{"parts":[{"mode":"trolley1","coords":[[42.36453,-71.06253],[42.36444,-71.06245],[42.3643,-71.06266],[42.36379,-71.06209],[42.36355,-71.06203],[42.36333,-71.06118],[42.3633,-71.06079],[42.36282,-71.05921],[42.36245,-71.05844],[42.36215,-71.05817],[42.36183,-71.05789],[42.3611,-71.05755],[42.35907,-71.05696],[42.35879,-71.05676],[42.35758,-71.05641],[42.35792,-71.05504],[42.35739,-71.05368],[42.35653,-71.0529]]}],"walkMins":0},"sea_envoy":{"parts":[{"mode":"walk","coords":[[42.35299,-71.0477],[42.35334,-71.0484],[42.35385,-71.048],[42.35394,-71.04821]],"mins":2}],"walkMins":2},"envoy_scorp":{"parts":[{"mode":"walk","coords":[[42.35394,-71.04821],[42.35385,-71.048],[42.35334,-71.0484],[42.35294,-71.0476]],"mins":2}],"walkMins":2},"howl_grand":{"parts":[{"mode":"walk","coords":[[42.35655,-71.05286],[42.3565,-71.05282],[42.35618,-71.05324],[42.35559,-71.05247],[42.35514,-71.05169],[42.35442,-71.05073],[42.35345,-71.0488],[42.35329,-71.04845],[42.35334,-71.0484],[42.35299,-71.0477]],"mins":9}],"walkMins":9},"sea_howl":{"parts":[{"mode":"walk","coords":[[42.35294,-71.0476],[42.35334,-71.0484],[42.35329,-71.04845],[42.35345,-71.0488],[42.35442,-71.05073],[42.35514,-71.05169],[42.35559,-71.05247],[42.35618,-71.05324],[42.3565,-71.05282],[42.35655,-71.05286]],"mins":9}],"walkMins":9},"grand_back":{"parts":[{"mode":"walk","coords":[[42.35299,-71.0477],[42.35334,-71.0484],[42.35329,-71.04845],[42.35345,-71.0488],[42.35442,-71.05073],[42.35477,-71.0512],[42.35286,-71.055],[42.35249,-71.05535],[42.35227,-71.05523]],"mins":11},{"mode":"red","coords":[[42.35227,-71.05524],[42.35552,-71.06023],[42.35639,-71.06242]],"from":"South Station","to":"Park Street"},{"mode":"green","coords":[[42.35639,-71.06242],[42.35302,-71.06459],[42.3519,-71.07089],[42.34997,-71.07745]],"from":"Park Street","to":"Copley"},{"mode":"walk","coords":[[42.34998,-71.07745],[42.34863,-71.08244],[42.34879,-71.08252],[42.3479,-71.08587]],"mins":10}],"walkMins":21},"howl_back":{"parts":[{"mode":"walk","coords":[[42.35655,-71.05286],[42.3565,-71.05282],[42.35618,-71.05324],[42.35602,-71.05308],[42.35514,-71.05404],[42.35442,-71.0534],[42.35421,-71.05356],[42.35383,-71.05351],[42.3537,-71.05381],[42.35355,-71.05369],[42.35303,-71.05471],[42.35273,-71.05516],[42.35249,-71.05535],[42.35227,-71.05523]],"mins":8},{"mode":"red","coords":[[42.35227,-71.05524],[42.35552,-71.06023],[42.35639,-71.06242]],"from":"South Station","to":"Park Street"},{"mode":"green","coords":[[42.35639,-71.06242],[42.35302,-71.06459],[42.3519,-71.07089],[42.34997,-71.07745]],"from":"Park Street","to":"Copley"},{"mode":"walk","coords":[[42.34998,-71.07745],[42.34863,-71.08244],[42.34879,-71.08252],[42.3479,-71.08587]],"mins":10}],"walkMins":18},"dil_lans":{"parts":[{"mode":"walk","coords":[[42.3479,-71.08587],[42.34695,-71.08936],[42.34739,-71.0896],[42.34745,-71.08972],[42.34745,-71.09384],[42.34715,-71.09423],[42.34727,-71.09441],[42.34724,-71.09515]],"mins":11}],"walkMins":11},"grand_we":{"parts":[{"mode":"walk","coords":[[42.35299,-71.0477],[42.35334,-71.0484],[42.35329,-71.04845],[42.35345,-71.0488],[42.3545,-71.05086],[42.35481,-71.0512],[42.35536,-71.05204],[42.35537,-71.05214],[42.35602,-71.05307],[42.3561,-71.05309],[42.35742,-71.0549],[42.35768,-71.05521],[42.35776,-71.05522],[42.35774,-71.05541],[42.35892,-71.05594],[42.3588,-71.05663],[42.36151,-71.05746],[42.36234,-71.05814],[42.36246,-71.05813],[42.3628,-71.05867],[42.36298,-71.05911],[42.36308,-71.05919],[42.36314,-71.0598],[42.36342,-71.06087],[42.36374,-71.06121]],"mins":24}],"walkMins":24},"howl_we":{"parts":[{"mode":"walk","coords":[[42.35655,-71.05286],[42.35703,-71.05326],[42.35697,-71.05339],[42.35739,-71.05383],[42.35792,-71.05521],[42.358,-71.05517],[42.35807,-71.0554],[42.35821,-71.05548],[42.35906,-71.05586],[42.35903,-71.05604],[42.35962,-71.05627],[42.35959,-71.05668],[42.35971,-71.05691],[42.36151,-71.05746],[42.36234,-71.05814],[42.36246,-71.05813],[42.3628,-71.05867],[42.36298,-71.05911],[42.36308,-71.05919],[42.36314,-71.0598],[42.36342,-71.06087],[42.36374,-71.06121]],"mins":16}],"walkMins":16},"john_cause":{"parts":[{"mode":"walk","coords":[[42.36374,-71.06121],[42.36474,-71.06234],[42.36455,-71.0627]],"mins":2}],"walkMins":2},"we_home":{"parts":[{"mode":"walk","coords":[[42.36455,-71.0627],[42.36484,-71.06215],[42.36504,-71.06232],[42.36557,-71.06129]],"mins":2},{"mode":"green","coords":[[42.36558,-71.06129],[42.36302,-71.05829],[42.3597,-71.05921],[42.35639,-71.06242],[42.35302,-71.06459],[42.3519,-71.07089],[42.34997,-71.07745],[42.34789,-71.0879],[42.34895,-71.09517]],"from":"North Station","to":"Kenmore"}],"walkMins":2},"grand_gd":{"parts":[{"mode":"walk","coords":[[42.35299,-71.0477],[42.35334,-71.0484],[42.35329,-71.04845],[42.35345,-71.0488],[42.3545,-71.05086],[42.35481,-71.0512],[42.35536,-71.05204],[42.35537,-71.05214],[42.35602,-71.05307],[42.3561,-71.05309],[42.35765,-71.05518],[42.35776,-71.05522],[42.35786,-71.05508],[42.35792,-71.05521],[42.358,-71.05517],[42.35807,-71.0554],[42.35906,-71.05586],[42.35903,-71.05604],[42.35948,-71.05618],[42.35952,-71.05625],[42.35965,-71.05624],[42.35977,-71.05646],[42.36018,-71.05652],[42.36022,-71.05648],[42.36072,-71.05681],[42.36099,-71.05686],[42.36129,-71.05701],[42.36158,-71.0569],[42.36154,-71.05683]],"mins":18}],"walkMins":18},"howl_gd":{"parts":[{"mode":"walk","coords":[[42.35655,-71.05286],[42.35703,-71.05326],[42.35697,-71.05339],[42.35739,-71.05383],[42.35789,-71.05515],[42.35792,-71.05521],[42.358,-71.05517],[42.35807,-71.0554],[42.35906,-71.05586],[42.35903,-71.05604],[42.35948,-71.05618],[42.35952,-71.05625],[42.35965,-71.05624],[42.35977,-71.05646],[42.36018,-71.05652],[42.36022,-71.05648],[42.36072,-71.05681],[42.36099,-71.05686],[42.36129,-71.05701],[42.36158,-71.0569],[42.36154,-71.05683]],"mins":10}],"walkMins":10},"gd_alma":{"parts":[{"mode":"walk","coords":[[42.36154,-71.05683],[42.36158,-71.0569],[42.36129,-71.05701],[42.36086,-71.05684]],"mins":1}],"walkMins":1},"fan_home":{"parts":[{"mode":"walk","coords":[[42.36086,-71.05684],[42.36051,-71.0567],[42.36029,-71.05739],[42.35987,-71.05731],[42.35981,-71.05847],[42.36015,-71.05881],[42.35968,-71.05916]],"mins":5},{"mode":"green","coords":[[42.3597,-71.05921],[42.35639,-71.06242],[42.35302,-71.06459],[42.3519,-71.07089],[42.34997,-71.07745],[42.34789,-71.0879],[42.34895,-71.09517]],"from":"Government Center","to":"Kenmore"}],"walkMins":5}},"stations":{"Kenmore":[42.34895,-71.09517],"Hynes":[42.34789,-71.0879],"Copley":[42.34997,-71.07745],"Arlington":[42.3519,-71.07089],"Boylston":[42.35302,-71.06459],"Park Street":[42.35639,-71.06242],"Government Center":[42.3597,-71.05921],"Haymarket":[42.36302,-71.05829],"North Station":[42.36558,-71.06129],"South Station":[42.35227,-71.05524],"Downtown Crossing":[42.35552,-71.06023]},"loops":{"trolley1":[[42.36453,-71.06253],[42.36448,-71.06247],[42.36444,-71.06245],[42.36439,-71.06248],[42.36438,-71.06252],[42.36432,-71.06262],[42.3643,-71.06266],[42.36414,-71.06249],[42.36394,-71.06225],[42.36382,-71.06212],[42.3638,-71.0621],[42.36379,-71.06209],[42.36377,-71.06208],[42.36374,-71.06207],[42.36365,-71.06205],[42.36355,-71.06203],[42.36352,-71.0619],[42.3634,-71.06143],[42.36333,-71.06118],[42.36332,-71.06112],[42.36331,-71.06107],[42.3633,-71.06101],[42.36329,-71.06097],[42.36329,-71.06092],[42.36329,-71.06088],[42.36329,-71.06085],[42.36329,-71.06082],[42.3633,-71.06079],[42.36326,-71.06064],[42.36324,-71.06057],[42.36322,-71.06052],[42.36312,-71.06014],[42.36311,-71.06008],[42.36303,-71.0598],[42.3629,-71.05953],[42.36287,-71.0594],[42.36285,-71.05931],[42.36282,-71.05921],[42.36278,-71.05911],[42.36275,-71.05902],[42.3627,-71.05892],[42.36265,-71.05883],[42.3626,-71.05876],[42.36255,-71.05868],[42.36253,-71.05866],[42.36245,-71.05844],[42.36234,-71.05834],[42.36232,-71.05832],[42.36215,-71.05817],[42.36194,-71.05799],[42.36183,-71.05789],[42.36173,-71.05786],[42.36168,-71.05784],[42.36162,-71.05781],[42.36158,-71.05779],[42.36154,-71.05777],[42.36149,-71.05774],[42.36144,-71.05771],[42.36141,-71.05769],[42.36136,-71.05766],[42.3613,-71.05763],[42.3612,-71.05759],[42.3611,-71.05755],[42.36099,-71.05751],[42.36088,-71.05748],[42.36068,-71.05742],[42.36035,-71.05733],[42.36032,-71.05732],[42.36023,-71.05729],[42.36013,-71.05726],[42.35998,-71.05722],[42.35989,-71.0572],[42.35981,-71.05717],[42.35944,-71.05707],[42.35915,-71.05698],[42.35911,-71.05697],[42.35907,-71.05696],[42.35902,-71.05694],[42.359,-71.05693],[42.35899,-71.05692],[42.35897,-71.05691],[42.35895,-71.05689],[42.35893,-71.05686],[42.35892,-71.05685],[42.3589,-71.05683],[42.35888,-71.0568],[42.35885,-71.05679],[42.35883,-71.05678],[42.35881,-71.05678],[42.35879,-71.05676],[42.35875,-71.05675],[42.35847,-71.05667],[42.35812,-71.05657],[42.35806,-71.05655],[42.35774,-71.05645],[42.35764,-71.05642],[42.35761,-71.05642],[42.35758,-71.05641],[42.35759,-71.05634],[42.35759,-71.05631],[42.35759,-71.05628],[42.35778,-71.05547],[42.35779,-71.05543],[42.3578,-71.05536],[42.35782,-71.0553],[42.35784,-71.05526],[42.35786,-71.05521],[42.35789,-71.05515],[42.35793,-71.05509],[42.35792,-71.05504],[42.35791,-71.05501],[42.3579,-71.05498],[42.35784,-71.05482],[42.35771,-71.05449],[42.3577,-71.05446],[42.35768,-71.05442],[42.35766,-71.05436],[42.3575,-71.05394],[42.35747,-71.05385],[42.35744,-71.05378],[42.35742,-71.05373],[42.35739,-71.05368],[42.35736,-71.05364],[42.35726,-71.05355],[42.357,-71.05332],[42.35695,-71.05327],[42.3569,-71.05324],[42.35674,-71.05309],[42.35653,-71.0529],[42.35648,-71.05286],[42.35643,-71.05281],[42.35647,-71.05269],[42.3565,-71.05259],[42.35654,-71.05235],[42.35667,-71.05175],[42.35668,-71.05165],[42.35668,-71.05163],[42.35668,-71.05151],[42.35659,-71.0515],[42.35651,-71.0515],[42.35645,-71.0515],[42.3564,-71.0515],[42.35634,-71.0515],[42.35627,-71.05151],[42.35623,-71.05151],[42.35619,-71.05152],[42.35612,-71.05153],[42.35606,-71.05155],[42.35599,-71.05156],[42.35593,-71.05158],[42.35588,-71.0516],[42.35583,-71.05162],[42.35578,-71.05164],[42.35574,-71.05166],[42.35571,-71.05168],[42.35567,-71.0517],[42.35563,-71.05173],[42.35561,-71.05174],[42.35558,-71.05176],[42.35556,-71.05178],[42.35554,-71.0518],[42.35551,-71.05181],[42.35548,-71.05184],[42.35545,-71.05187],[42.35542,-71.0519],[42.35535,-71.05195],[42.35532,-71.05198],[42.35525,-71.05206],[42.35521,-71.0521],[42.35518,-71.05214],[42.35515,-71.05218],[42.3551,-71.05224],[42.35507,-71.05228],[42.35502,-71.05234],[42.35498,-71.05241],[42.35494,-71.05248],[42.3549,-71.05255],[42.35486,-71.05263],[42.35481,-71.05276],[42.35476,-71.05285],[42.35458,-71.05324],[42.35453,-71.05334],[42.35448,-71.05345],[42.35437,-71.05368],[42.3542,-71.054],[42.35415,-71.05412],[42.35404,-71.05401],[42.35387,-71.05384],[42.35375,-71.05371],[42.35368,-71.05363],[42.35377,-71.05344],[42.354,-71.05296],[42.35405,-71.05287],[42.35409,-71.05278],[42.35445,-71.05204],[42.35453,-71.05188],[42.3547,-71.05154],[42.35472,-71.0515],[42.35474,-71.05146],[42.35476,-71.05142],[42.35469,-71.05133],[42.35464,-71.05127],[42.35453,-71.05114],[42.35446,-71.05105],[42.35441,-71.05097],[42.35436,-71.0509],[42.35435,-71.05087],[42.3542,-71.05057],[42.35335,-71.04888],[42.35328,-71.04873],[42.35321,-71.04857],[42.35319,-71.04854],[42.35313,-71.04841],[42.35309,-71.04839],[42.35306,-71.04836],[42.35303,-71.04832],[42.353,-71.04827],[42.35267,-71.04757],[42.35233,-71.04683],[42.35232,-71.0468],[42.35226,-71.04667],[42.35234,-71.04658],[42.35241,-71.04672],[42.35277,-71.0475],[42.35285,-71.04768],[42.35293,-71.04784],[42.35307,-71.04816],[42.35309,-71.0482],[42.35311,-71.04826],[42.35312,-71.04831],[42.35313,-71.04836],[42.35313,-71.04841],[42.35319,-71.04854],[42.35321,-71.04857],[42.35328,-71.04873],[42.35335,-71.04888],[42.3542,-71.05057],[42.35435,-71.05087],[42.35436,-71.0509],[42.35441,-71.05097],[42.35446,-71.05105],[42.35453,-71.05114],[42.35464,-71.05127],[42.35469,-71.05133],[42.35476,-71.05142],[42.3549,-71.05151],[42.35507,-71.05172],[42.35509,-71.05175],[42.3551,-71.05178],[42.35511,-71.0518],[42.35513,-71.05182],[42.35515,-71.05187],[42.35525,-71.05206],[42.3553,-71.05217],[42.35547,-71.0524],[42.35567,-71.05266],[42.35598,-71.05308],[42.356,-71.0531],[42.35607,-71.0532],[42.35615,-71.05332],[42.35655,-71.05385],[42.35657,-71.05388],[42.35661,-71.05393],[42.35665,-71.05398],[42.35699,-71.05444],[42.35728,-71.05482],[42.3573,-71.05485],[42.35734,-71.0549],[42.35737,-71.05494],[42.35738,-71.05496],[42.35765,-71.05529],[42.35775,-71.05533],[42.3578,-71.05536],[42.35784,-71.05538],[42.35798,-71.05544],[42.35815,-71.05552],[42.35828,-71.05558],[42.3589,-71.05587],[42.35893,-71.05588],[42.359,-71.05591],[42.35893,-71.05632],[42.35891,-71.05649],[42.3589,-71.05653],[42.35889,-71.05657],[42.35889,-71.05661],[42.35889,-71.05665],[42.35888,-71.0568],[42.35892,-71.0568],[42.359,-71.0568],[42.35902,-71.0568],[42.35903,-71.0568],[42.35905,-71.0568],[42.35988,-71.05704],[42.35991,-71.05705],[42.36012,-71.0571],[42.36015,-71.05711],[42.36024,-71.05714],[42.36032,-71.05716],[42.36036,-71.05717],[42.3609,-71.05733],[42.36101,-71.05736],[42.36111,-71.05739],[42.36122,-71.05743],[42.36133,-71.05748],[42.36139,-71.05751],[42.36145,-71.05754],[42.36146,-71.05755],[42.36154,-71.05759],[42.36159,-71.05762],[42.36164,-71.05766],[42.36168,-71.05769],[42.36171,-71.05774],[42.36175,-71.05778],[42.36183,-71.05789],[42.36194,-71.05799],[42.36215,-71.05817],[42.36232,-71.05832],[42.36234,-71.05834],[42.36245,-71.05844],[42.36249,-71.05845],[42.36251,-71.05846],[42.36254,-71.05848],[42.36255,-71.05849],[42.36257,-71.0585],[42.36258,-71.0585],[42.36259,-71.05851],[42.3626,-71.05852],[42.36261,-71.05853],[42.36262,-71.05853],[42.36263,-71.05854],[42.36264,-71.05856],[42.36265,-71.05858],[42.36268,-71.05862],[42.3627,-71.05865],[42.36271,-71.05867],[42.36273,-71.0587],[42.36275,-71.05873],[42.36277,-71.05878],[42.3628,-71.05884],[42.36282,-71.05888],[42.36283,-71.05892],[42.36285,-71.05897],[42.36287,-71.05901],[42.36288,-71.05905],[42.36289,-71.05908],[42.36299,-71.05948],[42.36303,-71.0598],[42.36311,-71.06008],[42.36312,-71.06014],[42.36322,-71.06052],[42.36324,-71.06057],[42.36326,-71.06064],[42.3633,-71.06079],[42.36331,-71.06081],[42.36333,-71.06083],[42.36334,-71.06086],[42.36335,-71.06089],[42.36346,-71.06133],[42.3636,-71.06186],[42.36365,-71.06205],[42.36383,-71.06275],[42.36387,-71.06292],[42.36393,-71.06316],[42.36395,-71.0632],[42.36396,-71.06325],[42.36396,-71.06327],[42.36398,-71.06336],[42.364,-71.06335],[42.36401,-71.06334],[42.36402,-71.06333],[42.36405,-71.06333],[42.36407,-71.06332],[42.36409,-71.06332],[42.36421,-71.06332],[42.36423,-71.06333],[42.36425,-71.06333],[42.36428,-71.06333],[42.36433,-71.06323],[42.36437,-71.06314],[42.36451,-71.06289],[42.36447,-71.06285],[42.3643,-71.06266],[42.36432,-71.06262],[42.36438,-71.06252],[42.36439,-71.06248],[42.36444,-71.06245],[42.36448,-71.06247],[42.36453,-71.06253]],"trolley2":[[42.34692,-71.09885],[42.34711,-71.09865],[42.34716,-71.09861],[42.34718,-71.09858],[42.34718,-71.09846],[42.34719,-71.09771],[42.34719,-71.09765],[42.34719,-71.09673],[42.34719,-71.09619],[42.34719,-71.09536],[42.34719,-71.09477],[42.3472,-71.09469],[42.34719,-71.09465],[42.34719,-71.09463],[42.34719,-71.09462],[42.34717,-71.09459],[42.34715,-71.09455],[42.3471,-71.09445],[42.34721,-71.09432],[42.34732,-71.09421],[42.3474,-71.09411],[42.34743,-71.09408],[42.34745,-71.09405],[42.34747,-71.09402],[42.34749,-71.09398],[42.3475,-71.09395],[42.34751,-71.09389],[42.34752,-71.09385],[42.34752,-71.09365],[42.34752,-71.09351],[42.34752,-71.09202],[42.34752,-71.09177],[42.34752,-71.09153],[42.34752,-71.091],[42.34753,-71.08988],[42.34752,-71.08982],[42.34752,-71.08976],[42.34752,-71.08971],[42.34751,-71.08967],[42.34749,-71.08962],[42.34747,-71.08958],[42.34744,-71.08954],[42.3474,-71.08951],[42.34736,-71.08948],[42.34732,-71.08946],[42.347,-71.0893],[42.34698,-71.08929],[42.34697,-71.08928],[42.34689,-71.08922],[42.34692,-71.08913],[42.34693,-71.08909],[42.34705,-71.08866],[42.34713,-71.08836],[42.34722,-71.08802],[42.34723,-71.08797],[42.34725,-71.0879],[42.3473,-71.08773],[42.34732,-71.08752],[42.34736,-71.08736],[42.34741,-71.0872],[42.34742,-71.08715],[42.3475,-71.08684],[42.34753,-71.08674],[42.34764,-71.08634],[42.34769,-71.08615],[42.3478,-71.08576],[42.34781,-71.08572],[42.34788,-71.08558],[42.34791,-71.08546],[42.34794,-71.08537],[42.34797,-71.08526],[42.348,-71.08514],[42.34812,-71.08469],[42.34833,-71.08389],[42.34835,-71.08384],[42.34837,-71.08375],[42.34846,-71.08344],[42.3487,-71.08252],[42.34871,-71.08248],[42.34874,-71.08237],[42.34878,-71.08224],[42.3489,-71.08179],[42.34913,-71.08093],[42.34914,-71.08088],[42.34917,-71.08078],[42.34939,-71.07996],[42.34947,-71.07966],[42.34949,-71.0796],[42.34951,-71.0795],[42.34954,-71.0794],[42.34975,-71.07862],[42.35001,-71.07766],[42.35005,-71.0775],[42.35006,-71.07747],[42.35009,-71.07734],[42.3501,-71.07731],[42.35015,-71.07714],[42.3504,-71.07619],[42.35064,-71.07533],[42.35065,-71.07529],[42.35067,-71.0752],[42.35069,-71.07512],[42.35092,-71.07428],[42.35106,-71.07373],[42.35121,-71.0732],[42.35122,-71.07316],[42.35125,-71.07306],[42.35128,-71.07296],[42.35168,-71.07145],[42.35184,-71.07085],[42.35186,-71.07081],[42.3519,-71.0707],[42.3519,-71.07057],[42.35193,-71.07047],[42.35199,-71.07024],[42.35205,-71.06997],[42.35219,-71.06929],[42.35219,-71.06925],[42.35221,-71.06917],[42.35224,-71.06902],[42.35232,-71.06859],[42.35233,-71.06853],[42.3524,-71.06821],[42.35248,-71.0678],[42.3525,-71.06765],[42.35251,-71.06761],[42.35251,-71.06757],[42.35252,-71.06749],[42.35253,-71.06733],[42.35252,-71.06711],[42.35252,-71.06694],[42.3525,-71.06635],[42.35249,-71.06611],[42.35247,-71.06592],[42.35245,-71.0655],[42.35242,-71.06508],[42.35239,-71.06467],[42.35237,-71.06456],[42.35229,-71.06458],[42.35199,-71.06466],[42.35172,-71.06473],[42.35166,-71.06475],[42.35155,-71.06477],[42.35149,-71.06479],[42.3514,-71.06481],[42.3512,-71.06487],[42.35109,-71.06492],[42.35102,-71.06494],[42.35101,-71.06494],[42.35095,-71.06496],[42.35087,-71.06498],[42.35059,-71.06506],[42.35047,-71.0651],[42.35023,-71.06518],[42.35008,-71.06522],[42.35,-71.06525],[42.34982,-71.06529],[42.3498,-71.06529],[42.34965,-71.06533],[42.34953,-71.06535],[42.34949,-71.06536],[42.34937,-71.06539],[42.34875,-71.06552],[42.34872,-71.06552],[42.34863,-71.06554],[42.3486,-71.0654],[42.3486,-71.06536],[42.34844,-71.06435],[42.34844,-71.06431],[42.34843,-71.06419],[42.34842,-71.06408],[42.3485,-71.06406],[42.34889,-71.06395],[42.34901,-71.06392],[42.34945,-71.06376],[42.3496,-71.06368],[42.34971,-71.06363],[42.35006,-71.06345],[42.35019,-71.06338],[42.35079,-71.06308],[42.35083,-71.06306],[42.35093,-71.06304],[42.35101,-71.06299],[42.35107,-71.06294],[42.35118,-71.06292],[42.35143,-71.06285],[42.35145,-71.06284],[42.35148,-71.06283],[42.3515,-71.06283],[42.35152,-71.06282],[42.35153,-71.06282],[42.35155,-71.06281],[42.3516,-71.0628],[42.35167,-71.06278],[42.35178,-71.06275],[42.35184,-71.06274],[42.35186,-71.06274],[42.35192,-71.06272],[42.35228,-71.06262],[42.35231,-71.06261],[42.35239,-71.06259],[42.35242,-71.06244],[42.35248,-71.06171],[42.35249,-71.06152],[42.3525,-71.06148],[42.35251,-71.06139],[42.35252,-71.06114],[42.35253,-71.06107],[42.35256,-71.06067],[42.35257,-71.0604],[42.35257,-71.06014],[42.35256,-71.05998],[42.35255,-71.0598],[42.35254,-71.05953],[42.35253,-71.05948],[42.35252,-71.0594],[42.35251,-71.05932],[42.35241,-71.05851],[42.35238,-71.05829],[42.35238,-71.05824],[42.35237,-71.05817],[42.35237,-71.05809],[42.35238,-71.058],[42.35232,-71.0579],[42.35229,-71.05782],[42.35226,-71.05775],[42.35222,-71.05761],[42.3522,-71.05753],[42.35214,-71.05727],[42.35213,-71.05723],[42.35211,-71.05714],[42.35212,-71.05703],[42.35213,-71.05699],[42.35211,-71.05691],[42.3521,-71.05685],[42.35208,-71.05676],[42.35191,-71.05608],[42.35189,-71.05599],[42.35186,-71.05587],[42.35194,-71.05582],[42.35227,-71.05565],[42.35234,-71.05561],[42.35242,-71.05556],[42.35249,-71.05551],[42.35253,-71.05548],[42.35259,-71.05544],[42.35263,-71.05541],[42.35267,-71.05537],[42.3527,-71.05534],[42.35274,-71.0553],[42.35278,-71.05526],[42.35283,-71.05521],[42.35289,-71.05513],[42.35294,-71.05506],[42.35301,-71.05496],[42.35306,-71.05487],[42.35311,-71.05478],[42.35316,-71.05469],[42.35331,-71.05438],[42.35343,-71.05412],[42.35361,-71.05376],[42.35368,-71.05363],[42.35377,-71.05344],[42.354,-71.05296],[42.35405,-71.05287],[42.35409,-71.05278],[42.35445,-71.05204],[42.35453,-71.05188],[42.3547,-71.05154],[42.35472,-71.0515],[42.35474,-71.05146],[42.35476,-71.05142],[42.35469,-71.05133],[42.35464,-71.05127],[42.35453,-71.05114],[42.35446,-71.05105],[42.35441,-71.05097],[42.35436,-71.0509],[42.35435,-71.05087],[42.3542,-71.05057],[42.35335,-71.04888],[42.35328,-71.04873],[42.35321,-71.04857],[42.35319,-71.04854],[42.35313,-71.04841],[42.35309,-71.04839],[42.35306,-71.04836],[42.35303,-71.04832],[42.353,-71.04827],[42.35267,-71.04757],[42.35233,-71.04683],[42.35232,-71.0468],[42.35226,-71.04667],[42.35234,-71.04658],[42.35241,-71.04672],[42.35277,-71.0475],[42.3529,-71.04778],[42.35293,-71.04784],[42.35307,-71.04816],[42.35309,-71.0482],[42.35311,-71.04826],[42.35312,-71.04831],[42.35313,-71.04836],[42.35313,-71.04841],[42.35319,-71.04854],[42.35321,-71.04857],[42.35328,-71.04873],[42.35335,-71.04888],[42.3542,-71.05057],[42.35435,-71.05087],[42.35436,-71.0509],[42.35441,-71.05097],[42.35446,-71.05105],[42.35453,-71.05114],[42.35464,-71.05127],[42.35469,-71.05133],[42.35476,-71.05142],[42.3549,-71.05151],[42.35507,-71.05172],[42.35509,-71.05175],[42.3551,-71.05178],[42.35511,-71.0518],[42.35513,-71.05182],[42.35515,-71.05187],[42.35525,-71.05206],[42.35521,-71.0521],[42.35518,-71.05214],[42.35515,-71.05218],[42.3551,-71.05224],[42.35507,-71.05228],[42.35502,-71.05234],[42.35498,-71.05241],[42.35494,-71.05248],[42.3549,-71.05255],[42.35486,-71.05263],[42.35481,-71.05276],[42.35476,-71.05285],[42.35458,-71.05324],[42.35453,-71.05334],[42.35448,-71.05345],[42.35437,-71.05368],[42.3542,-71.054],[42.35415,-71.05412],[42.35408,-71.05425],[42.35397,-71.05447],[42.35388,-71.05463],[42.35378,-71.05483],[42.35333,-71.05567],[42.3533,-71.05571],[42.35329,-71.05574],[42.35327,-71.05575],[42.35326,-71.05577],[42.35325,-71.05579],[42.35323,-71.05581],[42.3532,-71.05584],[42.35317,-71.05587],[42.35313,-71.05591],[42.35311,-71.05595],[42.35308,-71.05598],[42.35305,-71.05602],[42.35303,-71.05605],[42.353,-71.0561],[42.35298,-71.05613],[42.35296,-71.05618],[42.35292,-71.05626],[42.3529,-71.0563],[42.35288,-71.05634],[42.35286,-71.05639],[42.35285,-71.05642],[42.35283,-71.05648],[42.35281,-71.05655],[42.35278,-71.05665],[42.35275,-71.05677],[42.35266,-71.05707],[42.35265,-71.05713],[42.35261,-71.05727],[42.35256,-71.05747],[42.35251,-71.05763],[42.35248,-71.05771],[42.35247,-71.05775],[42.35245,-71.05781],[42.35242,-71.0579],[42.35238,-71.058],[42.35233,-71.05812],[42.35229,-71.05821],[42.35226,-71.05828],[42.35222,-71.05835],[42.35218,-71.0584],[42.35213,-71.05849],[42.35209,-71.05854],[42.35206,-71.05858],[42.35202,-71.05864],[42.35198,-71.05869],[42.35194,-71.05874],[42.35189,-71.0588],[42.35186,-71.05884],[42.35182,-71.05888],[42.35178,-71.05892],[42.35174,-71.05895],[42.35171,-71.05899],[42.35167,-71.05902],[42.35163,-71.05905],[42.35159,-71.05909],[42.35151,-71.05914],[42.35145,-71.05919],[42.35139,-71.05922],[42.35134,-71.05925],[42.35128,-71.05928],[42.35124,-71.0593],[42.35118,-71.05933],[42.35114,-71.05935],[42.3511,-71.05937],[42.35102,-71.0594],[42.35027,-71.0597],[42.35014,-71.05975],[42.35019,-71.05989],[42.35027,-71.06016],[42.35028,-71.0602],[42.3503,-71.06025],[42.35045,-71.06081],[42.35047,-71.06087],[42.35049,-71.06093],[42.35056,-71.06122],[42.35058,-71.06128],[42.3506,-71.06137],[42.35062,-71.06145],[42.35064,-71.06152],[42.35066,-71.06161],[42.3508,-71.06213],[42.35082,-71.0622],[42.35088,-71.06242],[42.3509,-71.06252],[42.35091,-71.06263],[42.35093,-71.06288],[42.35093,-71.06304],[42.35093,-71.06318],[42.35093,-71.06321],[42.35095,-71.06338],[42.35096,-71.06346],[42.35098,-71.06367],[42.35101,-71.06391],[42.35106,-71.06439],[42.35108,-71.06467],[42.35108,-71.0648],[42.35109,-71.06492],[42.35109,-71.06507],[42.35109,-71.06545],[42.3511,-71.06607],[42.35108,-71.06617],[42.35107,-71.06625],[42.35103,-71.0664],[42.35103,-71.06643],[42.35102,-71.0667],[42.35103,-71.06674],[42.35104,-71.06679],[42.35105,-71.06683],[42.35107,-71.06687],[42.3511,-71.06691],[42.3514,-71.06704],[42.35154,-71.0671],[42.35168,-71.06717],[42.35176,-71.0672],[42.35184,-71.06722],[42.35217,-71.06737],[42.35233,-71.06743],[42.35241,-71.06745],[42.35244,-71.06746],[42.35252,-71.06749],[42.35259,-71.06751],[42.35272,-71.06755],[42.35281,-71.06758],[42.35284,-71.06759],[42.35294,-71.06761],[42.3533,-71.06781],[42.35399,-71.0682],[42.35442,-71.06843],[42.35451,-71.06849],[42.35508,-71.0688],[42.35542,-71.06898],[42.35561,-71.06909],[42.35575,-71.06921],[42.35591,-71.0693],[42.35599,-71.06935],[42.35603,-71.06939],[42.35605,-71.06941],[42.35607,-71.06946],[42.35608,-71.06948],[42.35609,-71.0695],[42.3561,-71.06954],[42.35609,-71.0696],[42.35609,-71.06965],[42.35607,-71.0698],[42.35607,-71.06989],[42.35606,-71.07005],[42.35592,-71.07063],[42.35578,-71.07122],[42.35578,-71.07125],[42.35576,-71.07132],[42.35557,-71.07205],[42.35552,-71.07221],[42.35548,-71.07246],[42.35547,-71.07249],[42.35539,-71.07271],[42.3553,-71.07304],[42.3553,-71.07305],[42.35527,-71.07316],[42.35499,-71.07418],[42.35484,-71.0747],[42.35483,-71.07473],[42.35481,-71.07479],[42.35489,-71.07484],[42.3553,-71.07504],[42.35533,-71.07505],[42.35536,-71.07507],[42.35537,-71.07509],[42.35538,-71.0751],[42.35539,-71.07512],[42.3554,-71.07514],[42.35542,-71.07516],[42.35543,-71.07519],[42.35544,-71.07523],[42.35544,-71.07526],[42.35545,-71.07528],[42.35545,-71.0753],[42.35545,-71.07532],[42.35545,-71.07534],[42.35545,-71.07536],[42.35544,-71.07538],[42.35544,-71.07541],[42.35543,-71.07543],[42.35513,-71.07685],[42.35507,-71.07718],[42.35467,-71.07866],[42.35463,-71.0788],[42.35459,-71.07896],[42.35453,-71.0791],[42.35448,-71.07927],[42.35442,-71.07942],[42.35438,-71.07956],[42.35433,-71.0797],[42.35428,-71.07987],[42.35413,-71.0804],[42.35403,-71.08075],[42.35391,-71.08121],[42.3537,-71.08198],[42.3531,-71.08419],[42.35309,-71.08426],[42.3525,-71.0864],[42.35243,-71.08667],[42.35239,-71.0868],[42.35236,-71.08694],[42.35233,-71.08708],[42.3523,-71.08722],[42.35228,-71.08737],[42.35226,-71.08751],[42.35224,-71.08767],[42.35222,-71.08786],[42.35219,-71.08815],[42.35217,-71.08827],[42.35184,-71.09136],[42.35168,-71.09197],[42.35161,-71.09221],[42.35155,-71.09242],[42.35149,-71.09259],[42.35146,-71.09268],[42.35145,-71.09271],[42.35144,-71.09273],[42.35143,-71.09278],[42.35142,-71.09284],[42.3514,-71.09289],[42.35139,-71.09291],[42.35138,-71.09294],[42.35136,-71.09297],[42.35135,-71.093],[42.35133,-71.09302],[42.35131,-71.09305],[42.35129,-71.09307],[42.35126,-71.09309],[42.35124,-71.0931],[42.35122,-71.09312],[42.35121,-71.09313],[42.35119,-71.09314],[42.35117,-71.09315],[42.35115,-71.09316],[42.35113,-71.09317],[42.35111,-71.09318],[42.3511,-71.09318],[42.35108,-71.09319],[42.35105,-71.09319],[42.35103,-71.09319],[42.35102,-71.09319],[42.351,-71.09319],[42.35097,-71.09319],[42.35095,-71.09318],[42.35093,-71.09318],[42.35092,-71.09317],[42.3509,-71.09317],[42.35089,-71.09316],[42.35088,-71.09315],[42.35087,-71.09315],[42.35086,-71.09314],[42.35084,-71.09313],[42.35082,-71.09311],[42.35078,-71.09309],[42.35074,-71.09305],[42.35069,-71.09301],[42.35066,-71.09299],[42.3506,-71.09295],[42.35058,-71.09293],[42.35056,-71.09292],[42.35054,-71.09292],[42.35052,-71.09291],[42.35051,-71.0929],[42.35048,-71.0929],[42.35044,-71.09289],[42.35039,-71.09289],[42.35007,-71.09288],[42.35004,-71.09288],[42.34993,-71.09287],[42.34989,-71.09299],[42.34986,-71.09313],[42.3498,-71.09336],[42.34941,-71.09485],[42.3494,-71.09489],[42.34937,-71.095],[42.34934,-71.09511],[42.34929,-71.09529],[42.34907,-71.09604],[42.34905,-71.09616],[42.34904,-71.09623],[42.34903,-71.09633],[42.34902,-71.09637],[42.34901,-71.09642],[42.34901,-71.09649],[42.349,-71.09656],[42.349,-71.0966],[42.34899,-71.09665],[42.34899,-71.09669],[42.34899,-71.09674],[42.34891,-71.09695],[42.34886,-71.0971],[42.34886,-71.09711],[42.34885,-71.09712],[42.34885,-71.09713],[42.34884,-71.09713],[42.34884,-71.09713],[42.34884,-71.09714],[42.34883,-71.09714],[42.34883,-71.09715],[42.34882,-71.09715],[42.34882,-71.09716],[42.34881,-71.09716],[42.3488,-71.09716],[42.34879,-71.09716],[42.34878,-71.09716],[42.34862,-71.09716],[42.34859,-71.09717],[42.34858,-71.09717],[42.34857,-71.09717],[42.34855,-71.09718],[42.34854,-71.09719],[42.34853,-71.09719],[42.34851,-71.09721],[42.34849,-71.09722],[42.34847,-71.09723],[42.34845,-71.09725],[42.34844,-71.09726],[42.34842,-71.09727],[42.34827,-71.09744],[42.34718,-71.09858],[42.34716,-71.09861],[42.34711,-71.09865],[42.34692,-71.09885]]},"busStops":[{"route":1,"venue":"the-harp","conf":"High"},{"route":1,"venue":"howl-at-the-moon","conf":"High"},{"route":1,"venue":"scorpion-bar","conf":"High"},{"route":2,"venue":"loco-fenway","conf":"High-medium"},{"route":2,"venue":"ghost-light-tavern","conf":"Medium"},{"route":2,"venue":"rock-bottom","conf":"Medium-high"},{"route":2,"venue":"the-grand","conf":"Medium-low"}]};
 (function () {
-  var root = document.documentElement;
-  root.classList.add("js");
-  var tabs = document.querySelectorAll("[data-tab]");
-  var panels = document.querySelectorAll("[data-panel]");
-  function show(name) {
-    panels.forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== name; });
-    tabs.forEach(function (t) { t.setAttribute("aria-selected", t.getAttribute("data-tab") === name ? "true" : "false"); });
-    try { localStorage.setItem("crawl-tab", name); } catch (e) {}
-  }
-  tabs.forEach(function (t) {
-    t.addEventListener("click", function (e) { e.preventDefault(); show(t.getAttribute("data-tab")); window.scrollTo(0, 0); });
-  });
-  var start = "route";
-  try { start = localStorage.getItem("crawl-tab") || "route"; } catch (e) {}
-  if (location.hash && document.querySelector('[data-panel="' + location.hash.slice(1) + '"]')) start = location.hash.slice(1);
-  show(start);
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  };
+  const V = Object.fromEntries(DATA.venues.map((v) => [v.id, v]));
+  const DIST = Object.fromEntries(DATA.districts.map((d) => [d.id, d]));
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const fmtH = (h) => { if (h >= 26) return "close"; const hr = Math.floor(h), m = Math.round((h - hr) * 60), hh = hr % 24; return ((hh + 11) % 12 + 1) + (m ? ":" + String(m).padStart(2, "0") : "") + (hh < 12 ? "am" : "pm"); };
+  const freeLabel = (v) => v.end == null ? "Not on the official list" : `Free entry ${fmtH(v.start).replace("pm", "")}–${fmtH(v.end)}`;
+  const place = (v) => `${v.short}, ${v.addr}`;
+  const dirURL = (dest, origin, mode) => "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(dest) + (origin ? "&origin=" + encodeURIComponent(origin) : "") + "&travelmode=" + (mode || "walking");
+  const webURL = (v) => v.web || "https://www.google.com/search?q=" + encodeURIComponent(v.short + " Boston bar");
+  const toast = (msg) => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2600); };
 
-  var chips = document.querySelectorAll(".chip");
-  var note = document.querySelector(".filter-note");
-  function fmt(h) {
-    var hr = Math.floor(h), m = Math.round((h - hr) * 60);
-    return ((hr + 11) % 12 + 1) + (m ? ":" + String(m).padStart(2, "0") : "") + (hr < 12 ? "am" : "pm");
+  /* ---------- map ---------- */
+  const map = L.map("map", { zoomControl: false, attributionControl: true }).setView([42.355, -71.075], 14);
+  map.attributionControl.setPrefix(false);
+  const dark = () => document.documentElement.getAttribute("data-theme") === "dark" || (document.documentElement.getAttribute("data-theme") !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  const esri = (svc, opts) => L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/" + svc + "/MapServer/tile/{z}/{y}/{x}", Object.assign({ maxZoom: 19 }, opts));
+  const STREET_ATTR = "© Esri, HERE, Garmin, © OpenStreetMap";
+  const STYLES = {
+    night: () => [esri("World_Street_Map", { attribution: STREET_ATTR })],
+    day: () => [esri("World_Street_Map", { attribution: STREET_ATTR })],
+    sat: () => [
+      esri("World_Imagery", { zIndex: 1, attribution: "Tiles © Esri — Esri, Maxar, Earthstar Geographics, and the GIS user community" }),
+      esri("Reference/World_Transportation", { zIndex: 2, opacity: .85 }),
+      esri("Reference/World_Boundaries_and_Places", { zIndex: 3 }),
+    ],
+  };
+  let tileLayers = [], mapStyle = store.get("crawl-style");
+  function setStyle(s) {
+    if (s) { mapStyle = s; store.set("crawl-style", s); }
+    const cur = mapStyle || (dark() ? "night" : "day");
+    tileLayers.forEach((l) => map.removeLayer(l));
+    tileLayers = STYLES[cur]().map((l) => l.addTo(map));
+    for (const k of Object.keys(STYLES)) map.getContainer().classList.toggle("style-" + k, k === cur);
+    document.querySelectorAll("#style-seg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.style === cur ? "true" : "false"));
   }
-  function filter(val) {
-    var t = null;
-    if (val === "now") { var d = new Date(); t = d.getHours() + d.getMinutes() / 60; }
-    else if (val !== "all") { t = parseFloat(val); }
-    document.querySelectorAll(".bar").forEach(function (b) {
-      var s = parseFloat(b.getAttribute("data-start")), e = parseFloat(b.getAttribute("data-end"));
-      var open = t === null || (!isNaN(s) && !isNaN(e) && t >= s && t < e);
-      b.classList.toggle("hidden", !open);
-    });
-    document.querySelectorAll(".district").forEach(function (d) {
-      d.classList.toggle("all-hidden", d.querySelectorAll(".bar:not(.hidden)").length === 0);
-    });
-    var shown = document.querySelectorAll(".bar:not(.hidden)").length;
-    note.textContent = t === null ? "" : shown + " bars open at " + fmt(t) + (val === "now" ? " (now)" : "");
+  setStyle();
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!mapStyle) setStyle(); redrawPlan(false); drawLoops(); }); } catch (e) {}
+  map.attributionControl.setPosition("topright");
+
+  const loopLayer = L.layerGroup().addTo(map);
+  const walkLayer = L.layerGroup().addTo(map);
+  const trolleyLegLayer = L.layerGroup().addTo(map);
+  const trainLayer = L.layerGroup().addTo(map);
+  const pinLayer = L.layerGroup().addTo(map);
+  const busLayer = L.layerGroup().addTo(map);
+  const PLAN_LAYER = { walk: walkLayer, trolley1: trolleyLegLayer, trolley2: trolleyLegLayer, green: trainLayer, red: trainLayer };
+
+  const prefs = Object.assign({ bars: true, walk: true, trolley: true, train: true }, store.get("crawl-layers") || {});
+  const state = { t: null, stops: {}, view: "plan", nearIds: [] };
+
+  function drawLoops() {
+    loopLayer.clearLayers(); busLayer.clearLayers();
+    if (!prefs.trolley || state.view !== "bars") return;
+    for (const [id, coords] of Object.entries(DATA.loops)) {
+      L.polyline(coords, { color: css("--" + id), weight: 3, opacity: .55, dashArray: "6 7", interactive: false }).addTo(loopLayer);
+    }
+    for (const b of DATA.busStops) {
+      const v = V[b.venue];
+      const col = css(b.route === 1 ? "--trolley1" : "--trolley2");
+      const off = b.route === 1 ? [0.00028, 0.00034] : [-0.00028, -0.00034];
+      const m = L.marker([v.lat + off[0], v.lon + off[1]], { icon: L.divIcon({ className: "pin-wrap", html: `<div class="bus" style="--b:${col}">🚎</div>`, iconSize: [26, 26] }), zIndexOffset: -100, keyboard: false });
+      m.bindPopup(`<div class="pop"><b>Trolley Route ${b.route} · ${esc(v.short)}</b><p class="small">Confidence: ${esc(b.conf)}. Based on the organizer's 2024–25 crawls. Trolleys looped 2–6pm.</p><p>${b.route === 1 ? "Loop: The Harp → Howl at the Moon → Scorpion Bar → back to The Harp" : "Loop: Loco Fenway → Ghost Light → Seaport → Rock Bottom → back to Loco Fenway"}</p></div>`);
+      m.addTo(busLayer);
+    }
   }
-  chips.forEach(function (c) {
-    c.addEventListener("click", function () {
-      chips.forEach(function (x) { x.setAttribute("aria-pressed", x === c ? "true" : "false"); });
-      filter(c.getAttribute("data-t"));
+
+  const pins = {};
+  function popupHTML(v) {
+    const d = DIST[v.d];
+    const ended = state.t != null && v.end != null && !(state.t >= v.start && state.t < v.end);
+    return `<div class="pop d-${v.d}">
+      <div class="pop-head"><span class="rk">${v.rank < 99 ? v.rank : "?"}</span><b>${esc(v.name)}</b></div>
+      <div class="pop-dist">${esc(d.name)}${v.rank < 99 ? ` · #${v.rank} in district` : ""}</div>
+      <p class="free" style="color:${ended ? "var(--bad)" : "var(--ok)"}">${esc(freeLabel(v))}${ended ? " · ended at that time" : ""}</p>
+      <p class="small">${esc(v.window)}</p>
+      <p>${esc(v.vibe)}</p>
+      ${v.perk && v.id !== "the-grand" ? `<p><b>Perk:</b> ${esc(v.perk)}</p>` : ""}
+      ${v.trolley ? `<p>🚎 ${esc(v.trolley)}</p>` : ""}
+      ${v.clears ? `<p class="flag">Big club: may clear the room after its window for a ticketed night party.</p>` : ""}
+      ${v.note ? `<p class="flag">${esc(v.note)}</p>` : ""}
+      <div class="pop-actions"><a class="btn ghost" href="${webURL(v)}" target="_blank" rel="noopener">${v.web ? "Website" : "Search web"}</a><a class="btn" href="${dirURL(place(v))}" target="_blank" rel="noopener">Directions</a></div>
+    </div>`;
+  }
+  function pinIcon(v) {
+    const ended = state.t != null && (v.end == null || !(state.t >= v.start && state.t < v.end));
+    const cls = ["pin", "d-" + v.d, ended ? "dim" : ""].join(" ");
+    return L.divIcon({ className: "pin-wrap", html: `<div class="${cls}">${v.rank < 99 ? v.rank : "?"}</div>`, iconSize: [26, 26] });
+  }
+  function drawPins() {
+    pinLayer.clearLayers();
+    for (const k of Object.keys(pins)) delete pins[k];
+    const show = state.view === "plan" ? (id) => !!state.stops[id]
+      : state.view === "near" ? (id) => state.nearIds.includes(id)
+      : () => true;
+    for (const v of DATA.venues) {
+      if (!show(v.id)) continue;
+      const m = L.marker([v.lat, v.lon], { icon: pinIcon(v), title: v.short, riseOnHover: true });
+      m.bindPopup(() => popupHTML(v), { autoPanPaddingTopLeft: [20, 80], autoPanPaddingBottomRight: [20, sheetPx() + 20] });
+      m.addTo(pinLayer);
+      pins[v.id] = m;
+    }
+  }
+
+  /* ---------- plan ---------- */
+  const DEFAULTS = { leave: "trolley", seaport: "walk", five: "grand", eve: "fenway9" };
+  const choice = Object.assign({}, DEFAULTS, store.get("crawl-choices") || {});
+  const mins = (id) => DATA.legs[id].walkMins;
+
+  function itinerary(c) {
+    const out = [];
+    const S = (id, time, note) => out.push({ type: "stop", id, time, note });
+    const Lg = (leg, icon, text) => out.push({ type: "leg", leg, icon, text });
+    const D = (key, label, opts) => out.push({ type: "decision", key, label, opts });
+    const E = (text) => out.push({ type: "end", text });
+    const N = (text) => out.push({ type: "note", text });
+    let at, from;
+
+    function westEnd(t1, t2, t3) {
+      S("the-greatest-bar", t1, "The West End's #1 party bar. Free entry until 6. It's a club, so it may clear after.");
+      Lg("gb_harp", "walk", `Walk ${mins("gb_harp")} min.`);
+      S("the-harp", t2, "Irish pub with a dance floor. The Route 1 trolley stops right outside.");
+      Lg("harp_r1_howl", "trolley1", "Route 1 trolley from outside The Harp to Howl at the Moon. No trolley? Walk 12 min to Ned Devine's (Faneuil's #1), then 9 min to Howl.");
+      S("howl-at-the-moon", t3, "Dueling pianos. Free entry until 6. Be inside by then and you can most likely stay.");
+      at = "howl";
+    }
+    function backToFenway(lg, tDil, tLans, lansNote) {
+      Lg(lg, "train", `Walk ${DATA.legs[lg].parts[0].mins} min to South Station. Red Line to Park St, then Green Line (B, C or D) to Copley. ~35–40 min total.`);
+      S("dillons", tDil, "Back Bay's #1, free entry until 9. Swingers (free arcade card) is a 5-min walk.");
+      Lg("dil_lans", "walk", `Walk ${mins("dil_lans")} min down Boylston St.`);
+      S("the-lansdowne-pub", tLans, lansNote);
+      E("🚗 Your cars are a few minutes' walk away.");
+    }
+
+    S("mighty-squirrel", "12:00", "Check in, have one drink and go. Confirm the check-in spot on your ticket first.");
+    Lg("ms_lor", "walk", `Walk ${mins("ms_lor")} min to Lansdowne St.`);
+    S("lorettas-last-call", "12:40", "Line dancing and live country. Go early; the line grows all afternoon.");
+    Lg("lor_go", "walk", `Walk ${mins("lor_go")} min down Lansdowne.`);
+    S("game-on", "1:25", "Huge sports bar, easy to get into. The Route 2 trolley stop at Loco Fenway is a 1-min walk.");
+    D("leave", "~2:00 · How do we leave Fenway?", [["train", "🚇 Green Line"], ["trolley", "🚎 Trolley"]]);
+
+    if (c.leave === "train") {
+      Lg("go_train_we", "train", "Walk 5 min to Kenmore. Green Line D (Union Square-bound) to North Station, ~20 min.");
+      westEnd("2:30", "3:30", "4:15");
+    } else {
+      Lg("go_r2_sea", "trolley2", "Route 2 trolley from Loco Fenway. It runs through the Theater District (Ghost Light and Rock Bottom are stops if you want to hop off) to the Seaport, ~30 min plus the wait. Not on a trolley by 2:15? Walk to Kenmore and take the Green Line instead.");
+      D("seaport", "~2:45 · In the Seaport", [["r1", "🚎 Route 1 to West End"], ["walk", "🚶 Walk to West End"], ["stay", "🌃 Stay in Seaport"]]);
+      if (c.seaport === "stay") {
+        Lg("sea_envoy", "walk", `Walk ${mins("sea_envoy")} min.`);
+        S("envoy-rooftop-lookout", "2:45", "Skyline rooftop, free entry 2–6. It's small, so go early. Bring a layer.");
+        Lg("envoy_scorp", "walk", `Walk ${mins("envoy_scorp")} min.`);
+        S("scorpion-bar", "3:45", "Tequila bar downstairs from The Grand. Lucky's Lounge (7 min away) is the alternative.");
+        at = "seaport";
+      } else {
+        if (c.seaport === "r1") Lg("sea_r1_harp", "trolley1", "Route 1 trolley from Scorpion Bar. Its next stop is The Harp, ~15 min plus the wait. The Greatest Bar is 3 min from there. Leave the Seaport by ~3:15.");
+        else Lg("sea_walk_we", "walk", `Walk ${mins("sea_walk_we")} min to the West End. Leave the Seaport by ~3:15.`);
+        westEnd("3:15", "4:00", "4:30");
+      }
+    }
+
+    D("five", "By 5 · Where do we want to be?", [["grand", "🎧 The Grand · Pauly D"], ["howl", "🎹 Howl at the Moon"], ["fenway", "🏠 Back to Fenway"]]);
+    if (c.five === "fenway") {
+      backToFenway(at === "howl" ? "howl_back" : "grand_back", "5:45", "7:00", "All of Fenway is free until 9, so hop around Lansdowne St. Be inside your last bar before 9 and stay until midnight.");
+      return out;
+    }
+    if (c.five === "grand") {
+      if (at === "howl") Lg("howl_grand", "walk", `Walk ${mins("howl_grand")} min, or take Route 1 if one is boarding.`);
+      S("the-grand", at === "howl" ? "5:00" : "4:45", "Pauly D at 5:30. Free entry until 8, but the club may clear after for a ticketed night party.");
+      from = "grand";
+    } else {
+      if (at === "seaport") { Lg("sea_howl", "walk", `Walk ${mins("sea_howl")} min north.`); S("howl-at-the-moon", "5:00", "Dueling pianos. Get inside before 6 and you can most likely stay."); }
+      else N("Stay at Howl. You're already inside before the 6pm cutoff.");
+      from = "howl";
+    }
+    D("eve", "~7:00 · Then where?", [["fenway9", "🏠 Fenway before 9"], ["westend", "🎉 West End night"], ["faneuil", "🍀 Faneuil night"]]);
+    if (c.eve === "fenway9") {
+      backToFenway(from === "grand" ? "grand_back" : "howl_back", "7:35", "8:45", "Get in before 9 and stay until midnight. Loretta's and Game On are next door.");
+    } else if (c.eve === "westend") {
+      const lg = from === "grand" ? "grand_we" : "howl_we";
+      Lg(lg, "walk", `Walk ${mins(lg)} min to the West End. Trolleys are likely done by 6.`);
+      S("west-end-johnnies", "~8:00", "Free entry until 9. Hurricane's, next door, is the same deal.");
+      Lg("john_cause", "walk", `Walk ${mins("john_cause")} min.`);
+      S("causeway", "9:00", "Free entry until close, so you can stay until midnight. Or buy tickets for Pauly D's 10pm show at Big Night Live next door.");
+      Lg("we_home", "train", "~12:00 · Walk 3 min to North Station, then Green Line D to Kenmore, ~20 min.");
+      E("🚗 Kenmore → walk to your cars.");
+    } else {
+      const lg = from === "grand" ? "grand_gd" : "howl_gd";
+      Lg(lg, "walk", `Walk ${mins(lg)} min to Faneuil Hall.`);
+      S("the-green-dragon", "~7:45", "Historic tavern with live Irish music. Get in before 8 and stay.");
+      Lg("gd_alma", "walk", "Walk 1 min.");
+      S("alma-cantina", "9:00", "Free entry until close. Or The Point's ticketed Halloween party, 1 min away (buy ahead).");
+      Lg("fan_home", "train", "~12:00 · Walk 5 min to Government Center, then Green Line (B, C or D) to Kenmore, ~15 min.");
+      E("🚗 Kenmore → walk to your cars.");
+    }
+    return out;
+  }
+
+  const ICON = { walk: "🚶", trolley1: "🚎", trolley2: "🚎", train: "🚇" };
+  let items = [];
+  function renderPlan() {
+    items = itinerary(choice);
+    state.stops = {};
+    let n = 0;
+    const stopsSeq = [];
+    for (const it of items) if (it.type === "stop") { n += 1; it.n = n; state.stops[it.id] = state.stops[it.id] || n; stopsSeq.push(it); }
+    const html = [];
+    items.forEach((it, i) => {
+      if (it.type === "decision") {
+        html.push(`<div class="decide"><div class="decide-label">${esc(it.label)}</div><div class="seg">${it.opts.map(([val, lbl]) => `<button data-key="${it.key}" data-val="${val}" aria-pressed="${choice[it.key] === val}">${esc(lbl)}</button>`).join("")}</div></div>`);
+      } else if (it.type === "stop") {
+        const v = V[it.id];
+        html.push(`<div class="it-stop d-${v.d}"><div class="num">${v.rank < 99 ? v.rank : "?"}</div><div class="it-body"><div class="it-time">Stop ${it.n} · ${esc(it.time)} · ${esc(DIST[v.d].name)}</div><button class="it-name" data-fly="${v.id}">${esc(v.short)}</button><div class="free">${esc(freeLabel(v))}${v.clears ? " · club, may clear after" : ""}</div><p>${esc(it.note)}</p><a class="mini" href="${dirURL(place(v))}" target="_blank" rel="noopener">Directions from here</a></div></div>`);
+      } else if (it.type === "leg") {
+        const prev = [...items.slice(0, i)].reverse().find((x) => x.type === "stop");
+        const next = items.slice(i + 1).find((x) => x.type === "stop");
+        let link = "";
+        if (prev && next && it.icon !== "trolley1" && it.icon !== "trolley2") {
+          link = `<br><a class="mini" href="${dirURL(place(V[next.id]), place(V[prev.id]), it.icon === "train" ? "transit" : "walking")}" target="_blank" rel="noopener">${it.icon === "train" ? "Transit directions" : "Walking directions"}</a>`;
+        }
+        html.push(`<div class="it-leg"><span class="ico">${ICON[it.icon]}</span><span>${esc(it.text)}${link}</span></div>`);
+      } else if (it.type === "note") {
+        html.push(`<p class="it-note">${esc(it.text)}</p>`);
+      } else if (it.type === "end") {
+        html.push(`<div class="it-end">${esc(it.text)}</div>`);
+      }
     });
+    $("#plan").innerHTML = html.join("");
+  }
+
+  const STYLE = {
+    walk: () => ({ color: css("--walk"), weight: 5, dashArray: "1 9", lineCap: "round" }),
+    trolley1: () => ({ color: css("--trolley1"), weight: 6 }),
+    trolley2: () => ({ color: css("--trolley2"), weight: 6 }),
+    green: () => ({ color: css("--green"), weight: 6 }),
+    red: () => ({ color: css("--red"), weight: 6 }),
+  };
+  let planBounds = null;
+  function redrawPlan(fit) {
+    walkLayer.clearLayers(); trolleyLegLayer.clearLayers(); trainLayer.clearLayers();
+    const all = [];
+    const stationsShown = new Set();
+    for (const it of items) {
+      if (it.type !== "leg") continue;
+      for (const part of DATA.legs[it.leg].parts) {
+        all.push(...part.coords);
+        const st = STYLE[part.mode]();
+        const layer = PLAN_LAYER[part.mode];
+        if (part.mode !== "walk") L.polyline(part.coords, { color: css("--casing"), weight: st.weight + 4, opacity: .9, interactive: false }).addTo(layer);
+        L.polyline(part.coords, Object.assign({ opacity: .95, interactive: false }, st)).addTo(layer);
+        if (part.from) for (const s of [part.from, part.to]) {
+          if (stationsShown.has(s)) continue;
+          stationsShown.add(s);
+          L.marker(DATA.stations[s], { icon: L.divIcon({ className: "pin-wrap", html: '<div class="stn">T</div>', iconSize: [20, 20] }), title: s, keyboard: false })
+            .bindPopup(`<b>${esc(s)}</b><p class="small">MBTA station</p>`).addTo(trainLayer);
+        }
+      }
+    }
+    for (const it of items) if (it.type === "stop") all.push([V[it.id].lat, V[it.id].lon]);
+    planBounds = all.length ? L.latLngBounds(all) : null;
+    if (fit && planBounds) fitPlan();
+  }
+  function fitPts(bounds) {
+    const desk = matchMedia("(min-width: 900px)").matches;
+    map.fitBounds(bounds, desk ? { paddingTopLeft: [440, 30], paddingBottomRight: [30, 30] } : { paddingTopLeft: [24, 80], paddingBottomRight: [24, sheetPx() + 16] });
+  }
+  function fitPlan() { if (planBounds) fitPts(planBounds); }
+
+  function refresh(fit) { renderPlan(); drawPins(); redrawPlan(fit); renderBars(); }
+
+  $("#plan").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-key]");
+    if (b) {
+      choice[b.dataset.key] = b.dataset.val;
+      store.set("crawl-choices", choice);
+      refresh(true);
+      return;
+    }
+    const f = e.target.closest("[data-fly]");
+    if (f) flyTo(f.dataset.fly);
   });
+
+  function flyTo(id) {
+    const v = V[id];
+    setSheet("peek");
+    const desk = matchMedia("(min-width: 900px)").matches;
+    const target = map.project([v.lat, v.lon], 16);
+    const offset = desk ? L.point(-200, 0) : L.point(0, sheetPx() / 2 - 20);
+    map.flyTo(map.unproject(target.add(offset), 16), 16, { duration: .6 });
+    setTimeout(() => { if (pins[id]) pins[id].openPopup(); }, 650);
+  }
+
+  /* ---------- bars tab ---------- */
+  function renderBars() {
+    const out = [];
+    for (const d of DATA.districts) {
+      const vs = DATA.venues.filter((v) => v.d === d.id).sort((a, b) => a.rank - b.rank);
+      out.push(`<div class="dhead d-${d.id}"><span class="sw"></span>${esc(d.name)}</div>`);
+      for (const v of vs) {
+        const ended = state.t != null && (v.end == null || !(state.t >= v.start && state.t < v.end));
+        const badge = state.t == null ? `<span class="badge ok">${esc(v.end == null ? "?" : "till " + fmtH(v.end))}</span>` : ended ? `<span class="badge bad">ended</span>` : `<span class="badge ok">free</span>`;
+        out.push(`<button class="row d-${v.d}${ended ? " ended" : ""}" data-fly="${v.id}"><span class="rk">${v.rank < 99 ? v.rank : "?"}</span><span class="nm">${esc(v.short)}${state.stops[v.id] ? " · stop " + state.stops[v.id] : ""}<small>${esc(v.vibe.split(". ")[0])}</small></span>${badge}</button>`);
+      }
+    }
+    $("#bars").innerHTML = out.join("");
+  }
+  $("#bars").addEventListener("click", (e) => { const r = e.target.closest("[data-fly]"); if (r) flyTo(r.dataset.fly); });
+  $("#chips").addEventListener("click", (e) => {
+    const c = e.target.closest(".chip"); if (!c) return;
+    document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c ? "true" : "false"));
+    const val = c.dataset.t;
+    if (val === "all") state.t = null;
+    else if (val === "now") state.t = nowHours();
+    else state.t = parseFloat(val);
+    const free = state.t == null ? null : DATA.venues.filter((v) => v.end != null && state.t >= v.start && state.t < v.end).length;
+    $("#filter-note").textContent = state.t == null ? "" : `${free} bars with free entry at ${fmtH(state.t)}${val === "now" ? " (now)" : ""}. Others are greyed out on the map.`;
+    renderBars(); drawPins();
+  });
+
+  /* ---------- sheet + tabs ---------- */
+  const sheet = $("#sheet");
+  const ORDER = ["min", "peek", "full"];
+  function sheetPx() { return matchMedia("(min-width: 900px)").matches ? 0 : sheet.getBoundingClientRect().height; }
+  function setSheet(s) { sheet.dataset.state = s; }
+  (function () {
+    const grab = $("#grab");
+    let y0 = null;
+    grab.addEventListener("pointerdown", (e) => { y0 = e.clientY; grab.setPointerCapture(e.pointerId); });
+    grab.addEventListener("pointerup", (e) => {
+      if (y0 == null) return;
+      const dy = e.clientY - y0; y0 = null;
+      let i = ORDER.indexOf(sheet.dataset.state);
+      if (dy < -30) i = Math.min(2, i + 1); else if (dy > 30) i = Math.max(0, i - 1); else i = i === 1 ? 2 : 1;
+      setSheet(ORDER[i]);
+    });
+  })();
+  document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".tabs button").forEach((x) => x.setAttribute("aria-selected", x === b ? "true" : "false"));
+    document.querySelectorAll(".panel").forEach((p) => { p.hidden = p.id !== "panel-" + b.dataset.tab; });
+    if (sheet.dataset.state === "min") setSheet("peek");
+    if (b.dataset.tab !== "info") setView(b.dataset.tab, true);
+    store.set("crawl-tab", b.dataset.tab);
+  }));
+
+  /* ---------- layers + locate ---------- */
+  $("#btn-layers").addEventListener("click", () => { const open = $("#layers").classList.toggle("open"); $("#btn-layers").setAttribute("aria-pressed", open); });
+  function setView(v, fit) {
+    state.view = v;
+    applyLayers();
+    if (!fit) return;
+    if (v === "plan") fitPlan();
+    else if (v === "bars") fitPts(L.latLngBounds(DATA.venues.map((x) => [x.lat, x.lon])));
+  }
+  function applyLayers() {
+    const planView = state.view === "plan";
+    for (const [layer, on] of [[walkLayer, planView && prefs.walk], [trolleyLegLayer, planView && prefs.trolley], [trainLayer, planView && prefs.train]]) {
+      if (on && !map.hasLayer(layer)) layer.addTo(map);
+      if (!on && map.hasLayer(layer)) map.removeLayer(layer);
+    }
+    drawLoops(); drawPins();
+    store.set("crawl-layers", prefs);
+  }
+  for (const k of ["walk", "trolley", "train"]) {
+    const box = $("#lyr-" + k);
+    box.checked = prefs[k];
+    box.addEventListener("change", () => { prefs[k] = box.checked; applyLayers(); });
+  }
+  $("#style-seg").addEventListener("click", (e) => { const b = e.target.closest("button[data-style]"); if (b) setStyle(b.dataset.style); });
+  let me = null, watchId = null;
+  $("#btn-locate").addEventListener("click", () => {
+    if (!("geolocation" in navigator)) return toast("Location isn't available on this device");
+    if (watchId != null) { if (me) map.flyTo(me.getLatLng(), 16); return; }
+    toast("Finding you…");
+    let first = true;
+    watchId = navigator.geolocation.watchPosition((p) => {
+      const ll = [p.coords.latitude, p.coords.longitude];
+      if (!me) me = L.marker(ll, { icon: L.divIcon({ className: "pin-wrap", html: '<div class="me"></div>', iconSize: [18, 18] }), zIndexOffset: 2000, keyboard: false }).addTo(map);
+      else me.setLatLng(ll);
+      $("#btn-locate").setAttribute("aria-pressed", "true");
+      if (first) { first = false; map.flyTo(ll, 16); }
+    }, (err) => { watchId = null; toast(err.code === 1 ? "Location permission was denied" : "Couldn't get your location"); }, { enableHighAccuracy: true, maximumAge: 15000 });
+  });
+
+  /* ---------- near me ---------- */
+  const haversine = (a, b) => {
+    const r = Math.PI / 180, dLat = (b[0] - a[0]) * r, dLon = (b[1] - a[1]) * r;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLon / 2) ** 2;
+    return 2 * 6371000 * Math.asin(Math.sqrt(h));
+  };
+  const fmtDist = (m) => { const mi = m / 1609.34; return mi < 0.1 ? `${Math.max(10, Math.round(m * 3.281 / 10) * 10)} ft` : `${mi.toFixed(mi < 1 ? 2 : 1)} mi`; };
+  const walkMin = (m) => Math.max(1, Math.round(m * 1.3 / 80));
+  function getPos() {
+    return new Promise((resolve, reject) => {
+      if (window.__NEAR_TEST) return resolve([window.__NEAR_TEST.lat, window.__NEAR_TEST.lon]);
+      if (!("geolocation" in navigator)) return reject(new Error("Location isn't available on this device."));
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve([p.coords.latitude, p.coords.longitude]),
+        (err) => reject(new Error(err.code === 1 ? "Location permission was denied. Allow it for this site in your browser settings, then try again." : "Couldn't get your location. Try again.")),
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+    });
+  }
+  function nowHours() {
+    if (window.__NEAR_TEST && window.__NEAR_TEST.hour != null) return window.__NEAR_TEST.hour;
+    const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+    return h < 5 ? h + 24 : h;
+  }
+  function nearRow(v, d, t) {
+    const status = t < v.start ? `<span class="near-free">Free entry from ${fmtH(v.start)}</span>`
+      : v.end - t <= 0.75 ? `<span class="near-free soon">Free entry ends at ${fmtH(v.end)} (${Math.round((v.end - t) * 60)} min)</span>`
+      : `<span class="near-free okc">Free entry until ${fmtH(v.end)}</span>`;
+    return `<div class="near d-${v.d}"><span class="rk">${v.rank < 99 ? v.rank : "?"}</span><div class="near-body">
+      <button class="near-name" data-fly="${v.id}">${esc(v.short)}</button>
+      <div class="near-meta">${esc(DIST[v.d].name)} · ${fmtDist(d)} · ~${walkMin(d)} min walk${state.stops[v.id] ? " · on our route" : ""}</div>${status}
+      <div class="near-actions"><a class="mini" href="${dirURL(place(v))}" target="_blank" rel="noopener">Directions</a><a class="mini" href="${webURL(v)}" target="_blank" rel="noopener">${v.web ? "Website" : "Search web"}</a></div>
+    </div></div>`;
+  }
+  async function findNear() {
+    const note = $("#near-note"), list = $("#near-list");
+    note.textContent = "Finding you…"; list.innerHTML = "";
+    let pos;
+    try { pos = await getPos(); } catch (e) { note.textContent = e.message; return; }
+    if (!me) me = L.marker(pos, { icon: L.divIcon({ className: "pin-wrap", html: '<div class="me"></div>', iconSize: [18, 18] }), zIndexOffset: 2000, keyboard: false }).addTo(map);
+    else me.setLatLng(pos);
+    const t = nowHours();
+    const ranked = DATA.venues.filter((v) => v.end != null).map((v) => ({ v, d: haversine(pos, [v.lat, v.lon]) })).sort((a, b) => a.d - b.d);
+    const open = ranked.filter(({ v }) => t >= v.start && t < v.end).slice(0, 10);
+    const later = ranked.filter(({ v }) => t < v.start).slice(0, 5);
+    const d = new Date(), crawlDay = d.getFullYear() === 2026 && d.getMonth() === 9 && d.getDate() === 31;
+    note.textContent = `Closest crawl bars at ${fmtH(t)}${crawlDay || window.__NEAR_TEST ? "" : " (today's clock; on crawl day this is live)"}. Tap a name to see it on the map.`;
+    let html = "";
+    if (open.length) html += `<div class="near-sec">Free entry right now</div>` + open.map(({ v, d }) => nearRow(v, d, t)).join("");
+    if (later.length) html += `<div class="near-sec">Free entry starts later</div>` + later.map(({ v, d }) => nearRow(v, d, t)).join("");
+    if (!html) html = `<p>No crawl bar has free entry left at ${fmtH(t)}. Expect a cover anywhere you go now.</p>`;
+    list.innerHTML = html;
+    state.nearIds = [...open, ...later].map(({ v }) => v.id);
+    drawPins();
+    fitPts(L.latLngBounds([pos, ...(open.length ? open : later).slice(0, 4).map(({ v }) => [v.lat, v.lon])]));
+  }
+  $("#near-go").addEventListener("click", findNear);
+  $("#near-list").addEventListener("click", (e) => { const f = e.target.closest("[data-fly]"); if (f) flyTo(f.dataset.fly); });
+  document.querySelector('.tabs button[data-tab="near"]').addEventListener("click", () => { if (!$("#near-list").innerHTML) findNear(); });
+
+  /* ---------- go ---------- */
+  refresh(true);
+  applyLayers();
+  const savedTab = store.get("crawl-tab");
+  if (savedTab === "bars" || savedTab === "info") { const b = document.querySelector(`.tabs button[data-tab="${savedTab}"]`); if (b) b.click(); }
 })();
 </script>
 </body>
